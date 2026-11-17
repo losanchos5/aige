@@ -1848,7 +1848,7 @@ export const datasets: readonly Dataset[] = [
     name: 'frontier-changes',
     title: 'Frontier safety frameworks: versions and changes',
     description:
-      'The published versions of the Anthropic, OpenAI and Google DeepMind frontier safety frameworks with their dates and file hashes, the revisions between consecutive versions, which are covered, and the material changes recorded for the covered ones, with quotes and the lab's own change notes. A description of published documents, not a claim about any lab's conduct.',
+      "The published versions of the Anthropic, OpenAI and Google DeepMind frontier safety frameworks with their dates and file hashes, the revisions between consecutive versions, which are covered, and the material changes recorded for the covered ones, with quotes and the lab's own change notes. A description of published documents, not a claim about any lab's conduct.",
     schemaVersion: frontierChangesSchemaVersion,
     page: FRONTIER_CHANGES_PATH,
     build: () => {
@@ -1900,10 +1900,10 @@ export const datasets: readonly Dataset[] = [
           recorded: s.dateOrNull('Day the changes were recorded.'),
           changeNotes: s.enumOf(
             ['itemised', 'narrative', 'redline', 'none', 'not-assessed'],
-            'Form of the lab's own account of the changes; not-assessed when not covered.',
+            "Form of the lab's own account of the changes; not-assessed when not covered.",
           ),
-          changeNotesUrl: s.uriOrNull('The lab's change notes or marked-up version.'),
-          noteSources: s.arr(s.int('Source number.', 1), 'Sources of the lab's change-note pages.'),
+          changeNotesUrl: s.uriOrNull("The lab's change notes or marked-up version."),
+          noteSources: s.arr(s.int('Source number.', 1), "Sources of the lab's change-note pages."),
           thirdParty: s.arr(s.int('Source number.', 1), 'Sources of third-party analyses of the revision.'),
         }),
         'Every revision between consecutive versions.',
@@ -1939,7 +1939,7 @@ export const datasets: readonly Dataset[] = [
           dimensions: s.arr(s.str('Dimension id of the frontier crosswalk.'), 'Dimensions affected.'),
           disclosure: s.enumOf(
             ['listed', 'partly-listed', 'not-listed', 'no-changelog'],
-            'Whether the lab's own change notes mention the change.',
+            "Whether the lab's own change notes mention the change.",
           ),
           verified: s.enumOf(['primary', 'secondary'], 'Verification of the record.'),
         }),
