@@ -2029,19 +2029,31 @@ export function latestVersion(framework: string): FrontierVersion | undefined {
 
 /**
  * For each lab document of the crosswalk: the version it maps, the latest one
- * recorded here, and whether they are the same.
+ * recorded here, whether they are the same, and when they are not the id of the
+ * transition that leaves the mapped version.
  */
 export function crosswalkVersionStatus(): {
   framework: string;
   mapped: string;
   latest: string | undefined;
   isLatest: boolean;
+  nextTransition: string | undefined;
 }[] {
   return frontierDocs
     .filter((d) => (frontierChangeFrameworks as readonly string[]).includes(d.frameworkId))
     .map((d) => {
-      const latest = latestVersion(d.frameworkId)?.version;
-      return { framework: d.frameworkId, mapped: d.version, latest, isLatest: latest === d.version };
+      const vs = versionsFor(d.frameworkId);
+      const latest = vs[0]?.version;
+      const at = vs.findIndex((v) => v.version === d.version);
+      const mapped = vs[at];
+      const next = at > 0 ? vs[at - 1] : undefined;
+      return {
+        framework: d.frameworkId,
+        mapped: d.version,
+        latest,
+        isLatest: latest === d.version,
+        nextTransition: mapped && next ? `${d.frameworkId}-${mapped.short}-${next.short}` : undefined,
+      };
     });
 }
 
