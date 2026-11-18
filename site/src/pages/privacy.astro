@@ -1,0 +1,238 @@
+---
+/**
+ * /privacy: what the site, the newsletter and the MCP server collect. Written
+ * from the code: the analytics tags and the guard in layouts/Base.astro and
+ * public/umami-guard.js, the named clicks (data-umami-event), the browser
+ * storage in src/scripts/theme.js and public/*.js, the newsletter form in
+ * components/NewsletterForm.astro and the logging section of
+ * tools/mcp-server/README.md. Every external host the CSP in public/_headers
+ * allows must be named here (tests/privacy.spec.ts). Claims about a vendor
+ * rest on that vendor's own documentation, linked in the text.
+ */
+import Doc from '../layouts/Doc.astro';
+import { site } from '../data/site';
+import { gitDate } from '../lib/reading';
+
+const reviewed = '2026-11-18';
+
+const vendors = {
+  umamiMetrics: 'https://docs.umami.is/docs/metric-definitions',
+  cloudflareAnalytics: 'https://www.cloudflare.com/web-analytics/',
+  cloudflarePrivacy: 'https://www.cloudflare.com/privacypolicy/',
+  buttondownPrivacy: 'https://buttondown.com/legal/privacy',
+  buttondownUnsubscribe: 'https://docs.buttondown.com/sending-emails',
+  githubPrivacy:
+    'https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement',
+  aepd: 'https://www.aepd.es/',
+};
+
+// One row per thing collected: what it is, who receives it, what for, how long.
+const rows = [
+  {
+    what: 'Page views, Web Vitals and named clicks (Umami)',
+    who: 'Me, on my own Umami server at admin.stocktcg.net',
+    why: 'To see which pages are read and which downloads are used',
+    keep: 'Until I delete them; there is no automatic deletion',
+  },
+  {
+    what: 'Page views and load times (Cloudflare Web Analytics)',
+    who: 'Cloudflare, through static.cloudflareinsights.com and cloudflareinsights.com',
+    why: 'A second count of visits and page speed',
+    keep: "Under Cloudflare's privacy policy",
+  },
+  {
+    what: 'Each request, with your IP address (hosting)',
+    who: 'Cloudflare, which hosts every page and file',
+    why: 'To serve the site and protect it from abuse',
+    keep: "Under Cloudflare's privacy policy",
+  },
+  {
+    what: 'Your email address, if you subscribe',
+    who: 'Buttondown, at buttondown.com',
+    why: 'To send the newsletter',
+    keep: 'Until you unsubscribe',
+  },
+  {
+    what: 'Request logs of the MCP server',
+    who: 'Me, on the server that runs it',
+    why: 'To count use and find faults',
+    keep: 'Until the log reaches 30 MB, when the oldest lines are dropped',
+  },
+  {
+    what: 'An email you send me',
+    who: 'Me, in my mailbox at Gmail (Google)',
+    why: 'To answer you',
+    keep: 'Until I delete it',
+  },
+  {
+    what: 'Your settings and progress on this site',
+    who: 'Nobody: it stays in your browser',
+    why: 'To remember the theme, what you read and your drafts',
+    keep: 'Until you clear it',
+  },
+];
+
+const headings = [
+  { depth: 2, slug: 'who-answers-for-the-data', text: 'Who answers for the data' },
+  { depth: 2, slug: 'what-is-collected', text: 'What is collected' },
+  { depth: 2, slug: 'analytics', text: 'Analytics' },
+  { depth: 2, slug: 'hosting', text: 'Hosting' },
+  { depth: 2, slug: 'newsletter', text: 'Newsletter' },
+  { depth: 2, slug: 'storage-in-your-browser', text: 'Storage in your browser' },
+  { depth: 2, slug: 'mcp-server', text: 'MCP server' },
+  { depth: 2, slug: 'email-and-github', text: 'Email and GitHub' },
+  { depth: 2, slug: 'what-this-site-does-not-do', text: 'What this site does not do' },
+  { depth: 2, slug: 'your-requests', text: 'Your requests' },
+];
+
+const title = 'Privacy';
+const summary =
+  'What this site, its newsletter and its MCP server collect, who receives it, how long it is kept and how to clear it.';
+const description =
+  'What AI Governance Engineer, its newsletter and its MCP server collect, who receives it, how long it is kept, and how to clear or delete it.';
+const updated = gitDate('src/pages/privacy.astro');
+---
+
+<Doc
+  title={title}
+  summary={summary}
+  description={description}
+  crumbs={[{ label: 'About', href: '/about' }, { label: title }]}
+  headings={headings}
+  updated={updated}
+  navGroup="about"
+  image="/og/about.png"
+>
+  <p>
+    You need no account to use this site, and no site code sets a cookie. This page lists what is
+    collected anyway, who receives it and how to get rid of it. Last reviewed:
+    <time datetime={reviewed}>{reviewed}</time>.
+  </p>
+
+  <h2 id="who-answers-for-the-data">Who answers for the data</h2>
+  <p>
+    I do: Jorge García Aibar, an individual in Spain, who writes and runs this site. You can reach
+    me at <a href={`mailto:${site.email}`}>{site.email}</a>.
+  </p>
+
+  <h2 id="what-is-collected">What is collected</h2>
+  <div class="table-scroll" tabindex="0" role="region" aria-label="What is collected">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">What</th>
+          <th scope="col">Who receives it</th>
+          <th scope="col">What for</th>
+          <th scope="col">How long</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((row) => (
+            <tr>
+              <td>{row.what}</td>
+              <td>{row.who}</td>
+              <td>{row.why}</td>
+              <td>{row.keep}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2 id="analytics">Analytics</h2>
+  <p>
+    <strong>Umami.</strong> The site loads a script from <code>admin.stocktcg.net</code>, a server
+    I run with the open-source Umami analytics. It records the page you open, the page title, the
+    site that sent you, your browser, operating system, device type, screen size, language and
+    approximate location, as the <a href={vendors.umamiMetrics}>Umami documentation</a> lists. It
+    is set to drop the query string and the fragment of the address, and to record page speed (Web
+    Vitals). Umami
+    uses no cookies. It tells visits apart by a hash of your IP address, your browser's user agent
+    and a salt that changes every month; the address itself is not stored in the visit record.
+    Browsers that report they are automated are not counted.
+  </p>
+  <p>
+    It also records named clicks: downloads of files, controls and schemas, copying a citation,
+    opening the search, the newsletter button, the contact email link, the LinkedIn link, the
+    contribute and open-issue links, and links to the API and MCP documentation. Each click carries
+    labels I set, such as the file or the place on the page. In the obligation lookup, choosing a
+    result records the address of the page you chose, never what you typed.
+  </p>
+  <p>
+    <strong>Cloudflare Web Analytics.</strong> The site also loads a beacon from
+    <code>static.cloudflareinsights.com</code>, which reports to <code>cloudflareinsights.com</code>.
+    <a href={vendors.cloudflareAnalytics}>Cloudflare says</a> it uses no cookies or local storage
+    for these counts and does not fingerprint visitors.
+  </p>
+
+  <h2 id="hosting">Hosting</h2>
+  <p>
+    Cloudflare Pages serves every page and file of this site. Cloudflare therefore handles each
+    request, including your IP address, as the host, under its
+    <a href={vendors.cloudflarePrivacy}>privacy policy</a>.
+  </p>
+
+  <h2 id="newsletter">Newsletter</h2>
+  <p>
+    The sign-up form sends only your email address, straight from your browser to Buttondown at
+    <code>buttondown.com</code>. This site never receives it. Buttondown keeps the list and sends
+    the emails, under its <a href={vendors.buttondownPrivacy}>privacy policy</a>. Buttondown
+    <a href={vendors.buttondownUnsubscribe}>adds an unsubscribe link</a> to every email; one click
+    removes you.
+  </p>
+
+  <h2 id="storage-in-your-browser">Storage in your browser</h2>
+  <p>
+    The site keeps a few things in your browser's local storage: the light or dark theme, the
+    chapters you marked as read, your progress on the learning path, the columns you chose in the
+    crosswalk, your drafts in the toolkit and your progress in the AIGP study plan. None of it is
+    sent to a server. The interactive tools also keep their state in the part of the address after
+    <code>#</code>, which browsers do not send to a server. To clear it all, delete this site's data
+    in your browser settings (often called "site data" or "cookies and site data").
+  </p>
+
+  <h2 id="mcp-server">MCP server</h2>
+  <p>
+    The <a href="/mcp">MCP server</a> at <code>mcp.aigovernanceengineer.com</code> needs no account
+    and no key. Its request logs keep the method, the tool called, the name and version the client
+    app announces and an optional tag you can add to the server URL. They never keep your IP
+    address, your user agent or what you asked. To limit request rates, the server keeps a keyed
+    hash of your address in memory only, and forgets it when the time window closes or the server
+    restarts. The proxy in front of the server does not log addresses. The
+    <a href={`${site.github}/tree/main/tools/mcp-server`}>server's README</a> gives the full detail.
+  </p>
+
+  <h2 id="email-and-github">Email and GitHub</h2>
+  <p>
+    If you write to me, your message stays in my mailbox, which Google hosts (Gmail). Issues and
+    discussions on the
+    <a href={site.github}>GitHub repository</a> live on GitHub, under GitHub's
+    <a href={vendors.githubPrivacy}>privacy statement</a>.
+  </p>
+
+  <h2 id="what-this-site-does-not-do">What this site does not do</h2>
+  <ul>
+    <li>It sets no cookies.</li>
+    <li>It shows no advertising.</li>
+    <li>It does not sell data, and shares none beyond the services named on this page.</li>
+    <li>It builds no profiles of visitors.</li>
+  </ul>
+
+  <h2 id="your-requests">Your requests</h2>
+  <p>
+    You can ask me by email what I hold about you, or ask me to delete it. If you are not satisfied
+    with my answer, you can complain to your data protection authority; in Spain that is the
+    <a href={vendors.aepd}>AEPD</a>.
+  </p>
+  <p>Last reviewed: <time datetime={reviewed}>{reviewed}</time>.</p>
+</Doc>
+
+<style>
+  /* Authored h2 in Doc's .prose well: :global(.prose) lifts it over
+     prose.css, as on /about/methodology. */
+  :global(.prose) > h2 {
+    font-size: var(--fs-h2);
+  }
+</style>
