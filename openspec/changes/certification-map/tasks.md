@@ -2,14 +2,14 @@
 
 ## 1. Datos
 
-- [ ] 1.1 Segunda lectura de las 51 entradas del mapa de
+- [x] 1.1 Segunda lectura de las 51 entradas del mapa de
       `D:/Documents/aige-wt/handoffs/competencies-visual/certs.json`: un revisor distinto del que
       investigó abre la URL de cada entrada y contrasta cada campo relleno. Verificar que el informe
-      (`handoffs/competencies-visual/review-core.md`) lista cada id como conforme, corregido o no
+      (`handoffs/competencies-visual/review-core-a.md` y `review-core-b.md`) lista cada id como conforme, corregido o no
       comprobable, con la URL abierta.
-- [ ] 1.2 Segunda lectura de las 33 entradas de proveedores (sin las cinco excluidas), con el mismo
+- [x] 1.2 Segunda lectura de las 33 entradas de proveedores (sin las cinco excluidas), con el mismo
       criterio; verificar el informe `handoffs/competencies-visual/review-vendors.md`.
-- [ ] 1.3 Crear `site/src/data/certifications.ts` con las 84 entradas ya corregidas, sus tipos y las
+- [x] 1.3 Crear `site/src/data/certifications.ts` con las 84 entradas ya corregidas, sus tipos y las
       etiquetas de temas y franjas, con las notas de estado limpias de texto que no venga del
       emisor; verificar el recuento (51 con `scope: 'core'`, 33 de proveedores) y que no está
       ninguno de los cinco ids excluidos.
