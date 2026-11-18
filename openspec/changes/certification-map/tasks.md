@@ -47,10 +47,10 @@
 
 ## 3. Documentación
 
-- [ ] 3.1 Sección en `CONTRIBUTING.md` sobre cómo corregir o añadir una credencial (campos, fuente
+- [x] 3.1 Sección en `CONTRIBUTING.md` sobre cómo corregir o añadir una credencial (campos, fuente
       primaria obligatoria, fecha, qué no se acepta); verificar que nombra el fichero de datos y la
       plantilla `report-an-error`.
-- [ ] 3.2 Revisar si `llms.txt.ts`, `llms-corpus.ts` o `astro.config.ts` describen el contenido de
+- [x] 3.2 Revisar si `llms.txt.ts`, `llms-corpus.ts` o `astro.config.ts` describen el contenido de
       `/for/certifications` y actualizar solo lo que quede falso; verificar con una búsqueda de
       "certifications" en esos tres ficheros.
 
