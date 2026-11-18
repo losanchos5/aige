@@ -36,12 +36,12 @@ SHALL llevar la fecha de su última revisión.
 
 ### Requirement: Terceros declarados
 
-Cada host externo que la política de seguridad de contenido del sitio permite para cargar scripts,
-abrir conexiones o enviar formularios MUST aparecer nombrado en `/privacy`.
+Cada host externo que la política de seguridad de contenido del sitio permite, en cualquier
+directiva, MUST aparecer nombrado en `/privacy`.
 
 #### Scenario: Tercero nuevo sin declarar
 
-- **WHEN** se añade un host externo a `script-src`, `connect-src` o `form-action` en
+- **WHEN** se añade un host externo a la política de seguridad de contenido de
   `site/public/_headers` y la página no lo nombra
 - **THEN** la suite de pruebas falla
 

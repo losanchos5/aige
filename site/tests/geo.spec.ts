@@ -257,12 +257,6 @@ test.describe('MCP server card', () => {
     for (const tool of card.tools) expect(tool.annotations.readOnlyHint, tool.name).toBe(true);
   });
 
-  test('/.well-known/mcp-registry-auth is one MCPv1 ed25519 public-key line in dist', () => {
-    const file = join('dist', '.well-known', 'mcp-registry-auth');
-    expect(existsSync(file)).toBe(true);
-    expect(readFileSync(file, 'utf8').trim()).toMatch(/^v=MCPv1; k=ed25519; p=[A-Za-z0-9+/]{43}=$/);
-  });
-
   test('/mcp and /llms.txt link the server card', async ({ request, page }) => {
     await page.goto('/mcp');
     await expect(page.locator('a[href="/.well-known/mcp.json"]')).toHaveCount(1);

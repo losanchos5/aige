@@ -1,14 +1,11 @@
 // privacy.spec.ts: /privacy names every third party the site may talk to.
 // Each external host the site-wide Content-Security-Policy in public/_headers
-// allows in script-src, connect-src or form-action must appear, by its
-// registrable domain, in the visible text of the built page. Adding a host to
-// the CSP without declaring it on /privacy fails here. Read from dist, like
-// seo-titles.spec.ts.
+// allows, in any directive, must appear, by its registrable domain, in the
+// visible text of the built page. Adding a host to the CSP without declaring
+// it on /privacy fails here. Read from dist, like seo-titles.spec.ts.
 import { test, expect } from '@playwright/test';
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-
-const DIRECTIVES = ['script-src', 'connect-src', 'form-action'];
 
 /** Registrable domains of the external hosts the site-wide CSP allows. */
 function cspThirdParties(): string[] {
@@ -17,12 +14,7 @@ function cspThirdParties(): string[] {
     .split(/^(?=\/)/m)
     .find((b) => b.startsWith('/*\n'));
   const csp = block?.split('\n').find((line) => line.includes('Content-Security-Policy:')) ?? '';
-  const hosts = csp
-    .split(';')
-    .map((d) => d.trim().split(/\s+/))
-    .filter(([name]) => DIRECTIVES.includes(name))
-    .flatMap(([, ...sources]) => sources.filter((s) => s.startsWith('https://')))
-    .map((s) => new URL(s).hostname.split('.').slice(-2).join('.'));
+  const hosts = (csp.match(/https:\/\/[^\s;]+/g) ?? []).map((s) => new URL(s).hostname.split('.').slice(-2).join('.'));
   return [...new Set(hosts)];
 }
 

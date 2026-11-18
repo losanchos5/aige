@@ -151,12 +151,14 @@ const updated = gitDate('src/pages/privacy.astro');
     Vitals). Umami
     uses no cookies. It tells visits apart by a hash of your IP address, your browser's user agent
     and a salt that changes every month; the address itself is not stored in the visit record.
-    Browsers that report they are automated are not counted.
+    Browsers that report they are automated are not counted. Like any web server, the one in front
+    of Umami sees your IP address when your browser calls it.
   </p>
   <p>
     It also records named clicks: downloads of files, controls and schemas, copying a citation,
     opening the search, the newsletter button, the contact email link, the LinkedIn link, the
-    contribute and open-issue links, and links to the API and MCP documentation. Each click carries
+    contribute and open-issue links, reference links on control pages, and links to the API and MCP
+    documentation. Each click carries
     labels I set, such as the file or the place on the page. In the obligation lookup, choosing a
     result records the address of the page you chose, never what you typed.
   </p>
@@ -176,8 +178,10 @@ const updated = gitDate('src/pages/privacy.astro');
 
   <h2 id="newsletter">Newsletter</h2>
   <p>
-    The sign-up form sends only your email address, straight from your browser to Buttondown at
-    <code>buttondown.com</code>. This site never receives it. Buttondown keeps the list and sends
+    The sign-up form sends your email address, and nothing else you typed, straight from your
+    browser to Buttondown at <code>buttondown.com</code>. Like any request, it also shows Buttondown
+    your IP address and your browser. This site never receives any of it. Buttondown keeps the list
+    and sends
     the emails, under its <a href={vendors.buttondownPrivacy}>privacy policy</a>. Buttondown
     <a href={vendors.buttondownUnsubscribe}>adds an unsubscribe link</a> to every email; one click
     removes you.
@@ -187,7 +191,8 @@ const updated = gitDate('src/pages/privacy.astro');
   <p>
     The site keeps a few things in your browser's local storage: the light or dark theme, the
     chapters you marked as read, your progress on the learning path, the columns you chose in the
-    crosswalk, your drafts in the toolkit and your progress in the AIGP study plan. None of it is
+    crosswalk, your drafts and saved entries in the toolkit and your progress in the AIGP study plan.
+    None of it is
     sent to a server. The interactive tools also keep their state in the part of the address after
     <code>#</code>, which browsers do not send to a server. To clear it all, delete this site's data
     in your browser settings (often called "site data" or "cookies and site data").
@@ -214,7 +219,7 @@ const updated = gitDate('src/pages/privacy.astro');
 
   <h2 id="what-this-site-does-not-do">What this site does not do</h2>
   <ul>
-    <li>It sets no cookies.</li>
+    <li>Its own code sets no cookies.</li>
     <li>It shows no advertising.</li>
     <li>It does not sell data, and shares none beyond the services named on this page.</li>
     <li>It builds no profiles of visitors.</li>

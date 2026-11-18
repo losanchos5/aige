@@ -47,9 +47,14 @@ Buttondown) se contrasta con la documentación del proveedor, y la fuente se ano
 PR. Lo que solo Jordi sabe (plazos de conservación, ubicación del servidor de Umami, base jurídica)
 se redacta con la opción más prudente y se lista en el PR para que lo confirme.
 
-**D3. Una prueba ata la página a la CSP.** Cada host externo de `script-src`, `connect-src` y
-`form-action` en `_headers` debe aparecer en `/privacy`. Añadir un tercero sin declararlo rompe la
-CI. No se prueba la lista de claves de `localStorage`: sería copiar el código en la prueba.
+**D3. Una prueba ata la página a la CSP.** Cada host externo que la CSP de `_headers` permite, en
+cualquier directiva, debe aparecer en `/privacy`. Añadir un tercero sin declararlo rompe la CI. No
+se prueba la lista de claves de `localStorage`: sería copiar el código en la prueba.
+
+**D3b. La metodología enlaza, no declara.** El spec `editorial-methodology` prohibía a
+`/about/methodology` hablar de financiación o independencia porque esa declaración era del autor y
+no existía. Ahora existe: la página la enlaza y sigue sin declarar nada por su cuenta. La prueba que
+buscaba esas palabras en la página pasa a exigir el enlace.
 
 **D4. La declaración de independencia dice lo que se puede sostener.** Financiación propia, sin
 patrocinios, publicidad ni enlaces de afiliado; sin dinero ni apoyo de laboratorios, proveedores u
