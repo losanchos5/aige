@@ -157,7 +157,7 @@ const top = rungs[rungs.length - 1];
                     <th scope="row" role="rowheader">
                       <span class="cm-rowname">
                         <span class={swatch(w.layerN)} aria-hidden="true" />
-                        <a href={`#${w.id}`}>{w.name}</a>
+                        <a href={`#${w.id}`}>{w.name}</a><span class="visually-hidden">, {layerLabel(w.layerN)}</span>
                       </span>
                     </th>
                     {matrixRungs.map((r) => {
@@ -165,13 +165,12 @@ const top = rungs[rungs.length - 1];
                       return (
                         <td role="cell">
                           <a class="cm-node" href={`#${competencyCellId(w.id, r.n)}`}>
-                            <span class="label cm-node-rung">
+                            <span class="label cm-node-rung" aria-hidden="true">
                               Rung {r.n} · {r.name}
                             </span>
                             <span class="cm-node-label">
                               <span class={swatch(w.layerN)} aria-hidden="true" />
-                              {cell.label}
-                              <span class="visually-hidden">, {w.name}</span>
+                              <span class="visually-hidden">Rung {r.n}: </span>{cell.label}<span class="visually-hidden">, {w.name}</span>
                             </span>
                           </a>
                         </td>
@@ -191,6 +190,14 @@ const top = rungs[rungs.length - 1];
               }
             </tbody>
           </table>
+          {/* Below 60rem the rowspan cell is not rendered and this copy follows the last track, so focus order equals visual order. */}
+          <div class="cm-end-after">
+            <a class="cm-node cm-node--end" href="#function">
+              <span class="label cm-node-rung">Rung {top.n}</span>
+              <span class="cm-node-name">{top.name}</span>
+              <span class="cm-node-label">{functionLabel}</span>
+            </a>
+          </div>
         </div>
       </div>
       <p class="credit">Mat: {matCredit}</p>
@@ -476,14 +483,24 @@ const top = rungs[rungs.length - 1];
   .cm-table td.cm-end {
     padding: 0 0 0 30px;
   }
-  .cm-table td.cm-end::before {
+  /* the bar: one segment per row at the right edge of its last station, so it follows any row height */
+  .cm-table tbody td:nth-child(5)::after {
     content: '';
     position: absolute;
-    left: 0;
-    top: calc(100% / 14);
-    bottom: calc(100% / 14);
+    top: 0;
+    bottom: 0;
+    right: 0;
     width: 1px;
     background: var(--cm-edge);
+  }
+  .cm-table tbody tr:first-child td:nth-child(5)::after {
+    top: 50%;
+  }
+  .cm-table tbody tr:last-child td:nth-child(5)::after {
+    bottom: 50%;
+  }
+  .cm-end-after {
+    display: none;
   }
   .cm-node--end {
     height: auto;
@@ -637,11 +654,7 @@ const top = rungs[rungs.length - 1];
       clip: rect(0 0 0 0);
       white-space: nowrap;
     }
-    .cm-table tbody {
-      position: relative;
-      padding-bottom: 9rem;
-    }
-    /* the row is the spine (its left border), so the fifth rung anchors to tbody */
+    /* the row is the spine (its left border) */
     .cm-table tbody tr {
       margin: 0 0 var(--s-5) 7px;
       padding-left: 21px;
@@ -667,6 +680,10 @@ const top = rungs[rungs.length - 1];
       margin-top: var(--s-2);
       padding: 0;
     }
+    .cm-table tbody td:nth-child(5)::after,
+    .cm-table thead th.cm-col-end {
+      display: none;
+    }
     .cm-table tbody td:not(.cm-end)::before {
       top: 50%;
       left: -21px;
@@ -685,22 +702,26 @@ const top = rungs[rungs.length - 1];
       padding: var(--s-3) var(--s-4) var(--s-4);
     }
     .cm-table tbody td.cm-end {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      margin: 0;
-      padding: 0 0 0 28px;
+      display: none;
     }
-    .cm-table td.cm-end::before {
+    /* the copy of the fifth rung: a normal block, its connector drawn from its own top up over the track gap */
+    .cm-end-after {
+      display: block;
+      position: relative;
+      padding-left: 29px;
+    }
+    .cm-end-after::before {
+      content: '';
+      position: absolute;
       left: 7px;
-      top: -30px;
-      bottom: auto;
-      height: 30px;
+      top: calc(-1 * var(--s-5));
+      height: calc(var(--s-5) + 18px);
+      width: 1px;
+      background: var(--cm-edge);
     }
     .cm-node--end::before {
       right: auto;
-      left: -28px;
+      left: -27px;
       top: 18px;
       width: 11px;
       height: 11px;

@@ -44,7 +44,10 @@ Ver `proposal.md` (Why). Estado de partida en origin/main `6f58743`:
    la tabla plegada en un `<details>` (variante A), porque duplica el contenido y obliga a cambiar la
    spec de la matriz.
 2. **Nodo del quinto peldaño dentro de la tabla.** Es una celda de la primera fila que abarca las
-   siete (`rowspan` y `aria-rowspan`), con su cabecera de columna, y enlaza a `#function`.
+   siete (`rowspan` y `aria-rowspan`), con su cabecera de columna, y enlaza a `#function`. En
+   pantallas estrechas (menos de 60rem) esa celda no se renderiza y el mismo nodo se repite justo
+   después de la tabla, con su propio conector, para que el orden de foco sea el orden visual; en
+   cada ancho se renderiza exactamente uno de los dos.
 3. **Etiquetas en los datos.** `CompetencyCell` gana `label` y el módulo exporta la etiqueta del
    quinto peldaño. `competencyProblems()` comprueba presencia y de dos a cuatro palabras. La API no
    cambia porque serializa los campos de la celda uno a uno (`site/src/lib/api.ts`).

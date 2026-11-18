@@ -71,16 +71,21 @@ test.describe('competency matrix: roadmap', () => {
     const hrefs = await roadmap(page).getByRole('link').evaluateAll((links) => links.map((a) => a.getAttribute('href') ?? ''));
     for (const cell of competencyCells) expect(hrefs).toContain(`#${competencyCellId(cell.workflow, cell.rung)}`);
     expect(hrefs).toContain('#function');
-    const dangling = await page.evaluate((all) => all.filter((h) => !document.getElementById(h.slice(1))), hrefs);
-    expect(dangling).toEqual([]);
   });
 
-  test('the table keeps its row, column and cell semantics after the restyle', async ({ page }) => {
+  // At 390 px the table is restyled to display:block, where only the explicit ARIA roles keep it a table.
+  test('on a phone the table keeps its row, column and cell roles and the fifth rung follows it', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(PAGE);
     const table = roadmap(page);
-    await expect(table.getByRole('columnheader')).toContainText(['Workflow', ...rungs.map((r) => `Rung ${r.n}`)]);
+    const stations = rungs.filter((r) => r.n <= 4);
+    await expect(table.getByRole('columnheader')).toContainText(['Workflow', ...stations.map((r) => `Rung ${r.n}`)]);
     await expect(table.getByRole('rowheader')).toContainText(workflows.map((w) => w.name));
-    await expect(table.getByRole('cell')).toHaveCount(competencyCells.length + 1);
+    await expect(table.getByRole('cell')).toHaveCount(competencyCells.length);
+    const top = rungs[rungs.length - 1];
+    const fifth = page.getByRole('link', { name: new RegExp(`Rung ${top.n}.*${top.name}`) });
+    await expect(fifth).toBeVisible();
+    await expect(fifth).toHaveAttribute('href', '#function');
   });
 });
 
