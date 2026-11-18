@@ -264,7 +264,7 @@ export const GET: APIRoute = async (context) => {
       page(
         'MCP server: how to connect',
         '/mcp',
-        'How to connect Claude, Claude Code or any MCP client to the public read-only server, and the ten tools it offers.',
+        'How to connect Claude, Claude Code or any MCP client to the public read-only server, and the twelve tools it offers.',
       ),
       linkLine(
         'Remote MCP server (read-only)',
