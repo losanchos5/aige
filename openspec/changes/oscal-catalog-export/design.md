@@ -53,9 +53,12 @@ perfil, y su DOI, cuando existe, va en `document-ids` con el esquema `http://www
 
 **D4. Mapeo de controles.** Un `mapping-collection` con un `mapping` por marco de
 `buildControlsCrosswalk()`: origen el catálogo propio, destino el marco, relación
-`intersects-with`, y las mismas convenciones que el explorador (procedencia, `props` con el espacio
-de nombres propio, `label` con la referencia original). El `id-ref` del destino debe ser un token:
-se normaliza con la misma regla que `clauseId()` del crosswalk temático.
+`intersects-with`, y las mismas convenciones que el explorador (`props` con el espacio de nombres
+propio, `label` con la referencia original). La procedencia declara `method: human`, no el `hybrid`
+del explorador: aquí cada par está escrito a mano en los datos del control, no generado a partir de
+temas compartidos. El `id-ref` del destino debe ser un token: se normaliza con la misma regla que
+`clauseId()` del crosswalk temático. Para NIST SP 800-53 el destino es la familia, que es lo que
+citan los datos.
 
 **D5. Determinismo.** Los `uuid` son UUID v5 de un espacio de nombres fijo y una clave estable
 (tipo de documento, identificador, y para cada par origen y destino). `last-modified` es la fecha
