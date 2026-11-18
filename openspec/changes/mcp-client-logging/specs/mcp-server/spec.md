@@ -7,7 +7,9 @@ descubrimiento. En `/mcp` SHALL aplicar CORS sin credenciales, un límite de cue
 (`MAX_BODY_BYTES`, `413` por encima) y un límite de tasa por cliente (`429` con `Retry-After`). En
 todas las rutas salvo `/healthz` MUST rechazar con `403` un `Host` fuera de `ALLOWED_HOSTS`, y con
 una lista `ALLOWED_ORIGINS` MUST rechazar con `403` un `Origin` fuera de ella. Los registros MUST
-ser líneas JSON sin dirección IP, agente de usuario ni argumentos de herramienta. Del cuerpo de una
+ser líneas JSON sin dirección IP, agente de usuario ni argumentos de herramienta. De las cabeceras
+`Mcp-Method` y `Mcp-Name` el registro SHALL guardar el valor solo cuando es un método MCP conocido o
+una herramienta del servidor, y `[other]` en otro caso. Del cuerpo de una
 petición a `/mcp` el registro SHALL tomar solo tres cosas: el método JSON-RPC, cuando es uno de los
 métodos MCP conocidos; el nombre de la herramienta de una llamada `tools/call`, cuando es una de las
 herramientas del servidor; y el nombre y la versión que el cliente anuncia en `initialize`, cuando
@@ -44,6 +46,11 @@ dirección con un secreto aleatorio por proceso y MUST olvidar cada entrada al c
 
 - **WHEN** una llamada `tools/call` nombra una herramienta que el servidor no tiene
 - **THEN** la línea lleva `[other]` como herramienta y no el texto recibido
+
+#### Scenario: Recurso pedido en la cabecera
+
+- **WHEN** un cliente envía en `Mcp-Name` la dirección de un recurso o texto libre
+- **THEN** la línea lleva `[other]` en ese campo y no el texto recibido
 
 #### Scenario: Etiqueta propia
 

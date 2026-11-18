@@ -45,10 +45,16 @@ const EXPOSED_HEADERS = [
   'Retry-After',
 ];
 
-/** A value from a client header that is safe to log (tool names, method names, our own URIs). */
+/** A protocol version from a client header, safe to log. */
 function loggable(value: string | undefined): string | undefined {
   if (value === undefined) return undefined;
   return /^[A-Za-z0-9_./:#-]{1,120}$/.test(value) ? value : '[other]';
+}
+
+/** A client header logged only as a member of a closed list: a resource URI or free text would say what was asked. */
+function listed(value: string | undefined, list: ReadonlySet<string>): string | undefined {
+  if (value === undefined) return undefined;
+  return list.has(value) ? value : '[other]';
 }
 
 const RPC_METHODS: ReadonlySet<string> = new Set([
@@ -74,8 +80,8 @@ function bodyLog(body: string, kind: 'batch' | 'listen' | 'other'): BodyLog {
   if (kind === 'batch') return { rpc: '[batch]' };
   try {
     const msg = JSON.parse(body) as { method?: unknown; params?: { name?: unknown; clientInfo?: { name?: unknown; version?: unknown } } };
-    if (typeof msg.method !== 'string') return {};
-    const out: BodyLog = { rpc: RPC_METHODS.has(msg.method) ? msg.method : '[other]' };
+    if (msg.method === undefined) return {};
+    const out: BodyLog = { rpc: typeof msg.method === 'string' && RPC_METHODS.has(msg.method) ? msg.method : '[other]' };
     if (msg.method === 'tools/call') out.tool = typeof msg.params?.name === 'string' && TOOLS.has(msg.params.name) ? msg.params.name : '[other]';
     if (msg.method === 'initialize') {
       const text = (v: unknown): string => (typeof v === 'string' && CLIENT_TEXT.test(v) ? v : '[other]');
@@ -188,8 +194,8 @@ export function createApp(deps: AppDeps): App {
       path: c.req.path,
       status: c.res.status,
       ms: Math.round(performance.now() - started),
-      mcpMethod: loggable(c.req.header('mcp-method')),
-      mcpName: loggable(c.req.header('mcp-name')),
+      mcpMethod: listed(c.req.header('mcp-method'), RPC_METHODS),
+      mcpName: listed(c.req.header('mcp-name'), TOOLS),
       protocol: loggable(c.req.header('mcp-protocol-version')),
       ...bodyLogs.get(c.req.raw),
       ...(tag !== undefined && TAG.test(tag) ? { tag } : {}),
@@ -251,7 +257,11 @@ export function createApp(deps: AppDeps): App {
     let longLived = false;
     if (c.req.method === 'POST') {
       // The body is at most MAX_BODY_BYTES here (bodyLimit ran first); the SDK reads the original.
-      const text = await c.req.raw.clone().text();
+      // An upload that aborts must not fail the request here: the SDK answers it.
+      const text = await c.req.raw
+        .clone()
+        .text()
+        .catch(() => '');
       const kind = messageKind(text);
       bodyLogs.set(c.req.raw, bodyLog(text, kind));
       if (kind === 'batch') {

@@ -409,12 +409,37 @@ describe('logs: what is read from the body', () => {
     assert.ok(!all.includes('drop_everything') && !all.includes('hidden-argument-value'));
   });
 
+  it('writes [other] for a method it does not know and [batch] for an array, never the text sent', async () => {
+    const cases: Array<[unknown, string]> = [
+      [{ jsonrpc: '2.0', id: 4, method: 'secret-method-text' }, '[other]'],
+      [{ jsonrpc: '2.0', id: 5, method: 5 }, '[other]'],
+      [[{ jsonrpc: '2.0', id: 6, method: 'secret-method-text' }], '[batch]'],
+    ];
+    for (const [body, rpc] of cases) {
+      await post(`${running.url}/mcp`, body).then((r) => r.text());
+      assert.equal(lastRequest().rpc, rpc, JSON.stringify(body));
+    }
+    assert.ok(!running.logs.join('\n').includes('secret-method-text'));
+  });
+
+  it('keeps a resource URI or free text sent in the Mcp-Name and Mcp-Method headers out of the log', async () => {
+    await post(`${running.url}/mcp`, LEGACY_INIT, {
+      'mcp-method': 'asked-in-a-header',
+      'mcp-name': 'https://aigovernanceengineer.com/api/v1/obligations/aige-obl-euaia-art9.json',
+    }).then((r) => r.text());
+    const line = lastRequest();
+    assert.deepEqual({ mcpMethod: line.mcpMethod, mcpName: line.mcpName }, { mcpMethod: '[other]', mcpName: '[other]' });
+    const all = running.logs.join('\n');
+    assert.ok(!all.includes('aige-obl-euaia-art9') && !all.includes('asked-in-a-header'));
+  });
+
   it('answers a non-JSON body as before and logs no method, tool or client', async () => {
     const response = await post(`${running.url}/mcp`, 'not json at all');
-    await response.text();
-    assert.ok(response.status >= 400 && response.status < 500);
+    const body = (await response.json()) as { error?: { code?: number } };
+    assert.equal(response.status, 400);
+    assert.equal(body.error?.code, -32700);
     const line = lastRequest();
-    assert.equal(line.status, response.status);
+    assert.equal(line.status, 400);
     for (const key of ['rpc', 'tool', 'client', 'clientVersion']) assert.ok(!(key in line), key);
   });
 });

@@ -44,6 +44,9 @@ secreto ni un control de acceso: cualquiera puede ponerla, y solo sirve para des
 
 **D5. Los campos que ya existían se conservan.** `mcpMethod`, `mcpName` y `protocol` siguen
 saliendo de las cabeceras; los nuevos se llaman `rpc`, `tool`, `client`, `clientVersion` y `tag`.
+Tras la revisión de seguridad, `mcpMethod` y `mcpName` se registran solo si casan con las mismas
+listas cerradas de D2: un cliente moderno refleja en `Mcp-Name` la dirección del recurso que lee, y
+eso es lo que se pregunta.
 
 **D6. Versión 0.6.1** en `package.json`, su lock, `SERVER_VERSION`, el ejemplo de compose del README
 y las pruebas que fijan la versión.
