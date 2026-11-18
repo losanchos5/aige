@@ -12,6 +12,8 @@ import PageHero from '../../components/PageHero.astro';
 import Callout from '../../components/Callout.astro';
 import Citation from '../../components/Citation.astro';
 import SkillsTable from '../../components/SkillsTable.astro';
+import Painting from '../../components/Painting.astro';
+import { paintings } from '../../data/paintings';
 import { site } from '../../data/site';
 import { workflows } from '../../data/role';
 import {
@@ -20,6 +22,7 @@ import {
   competencyCellId,
   competencyCells,
   competencyProblems,
+  functionLabel,
   functionStatements,
   rungs,
   skillsFor,
@@ -71,6 +74,9 @@ const cellOf = (workflow: string, rung: number) => {
   return cell;
 };
 const layerLabel = (n: number | 'all') => (n === 'all' ? 'All layers' : `Layer ${n}`);
+const swatch = (n: number | 'all') => (n === 'all' ? 'sw sw-none' : `sw sw-${n}`);
+const mat = paintings['pourville-misty-morning'];
+const matCredit = `${mat.artist}, ${mat.title}, ${mat.year}`;
 const matrixRungs = rungs.filter((r) => r.n <= 4);
 const top = rungs[rungs.length - 1];
 ---
@@ -103,50 +109,91 @@ const top = rungs[rungs.length - 1];
 
     <section class="res-section" aria-labelledby="cm-table-heading">
       <div class="res-section-head">
-        <h2 id="cm-table-heading">The matrix</h2>
+        <h2 id="cm-table-heading">The roadmap</h2>
         <p>
-          Rows are the workflows, with the stack layer each maps to. Columns are the rungs. Select a cell
-          for its evidence and the places on this site where it is learned.
+          Each track is one workflow. Read it from left to right across the four rungs, and see the seven
+          tracks meet at rung 5, the function. Select a node for its cell: what the person can own, the
+          evidence, and where to learn it.
         </p>
       </div>
-      <table class="cm-table" role="table">
-        <caption class="visually-hidden">
-          Competency matrix: what a person can own, by workflow and rung
-        </caption>
-        <thead role="rowgroup">
-          <tr role="row">
-            <th scope="col" role="columnheader">Workflow</th>
+      <div class="mat cm-mat">
+        <Painting id="pourville-misty-morning" sizes="(min-width: 1200px) 1168px, calc(100vw - 32px)" />
+        <div class="cm-panel">
+          <ul class="cm-legend" aria-label="Layer key">
             {
-              matrixRungs.map((r) => (
-                <th scope="col" role="columnheader">
-                  <span class="cm-rung">Rung {r.n}</span>
-                  {r.name}
-                </th>
+              [1, 2, 3, 4, 5, 'all' as const].map((n) => (
+                <li>
+                  <span class={swatch(n)} aria-hidden="true" />
+                  <span class="label">{layerLabel(n)}</span>
+                </li>
               ))
             }
-          </tr>
-        </thead>
-        <tbody role="rowgroup">
-          {
-            workflows.map((w) => (
+          </ul>
+          <table class="cm-table" role="table">
+            <caption class="visually-hidden">
+              Competency roadmap: what a person can own, by workflow and rung
+            </caption>
+            <thead role="rowgroup">
               <tr role="row">
-                <th scope="row" role="rowheader">
-                  <a href={`#${w.id}`}>{w.name}</a>
-                  <span class="cm-note">{layerLabel(w.layerN)}</span>
+                <th scope="col" role="columnheader">Workflow</th>
+                {
+                  matrixRungs.map((r) => (
+                    <th scope="col" role="columnheader">
+                      <span class="label cm-rung">Rung {r.n}</span>
+                      {r.name}
+                    </th>
+                  ))
+                }
+                <th scope="col" role="columnheader" class="cm-col-end">
+                  <span class="label cm-rung">Rung {top.n}</span>
+                  {top.name}
                 </th>
-                {matrixRungs.map((r) => (
-                  <td role="cell" data-label={`Rung ${r.n}: ${r.name}`}>
-                    <a href={`#${competencyCellId(w.id, r.n)}`}>{cellOf(w.id, r.n).can}</a>
-                  </td>
-                ))}
               </tr>
-            ))
-          }
-        </tbody>
-      </table>
-      <p class="cm-note">
-        The fifth rung, {top.name}, is not split by workflow: <a href="#function">see the function band</a>.
-      </p>
+            </thead>
+            <tbody role="rowgroup">
+              {
+                workflows.map((w, i) => (
+                  <tr role="row">
+                    <th scope="row" role="rowheader">
+                      <span class="cm-rowname">
+                        <span class={swatch(w.layerN)} aria-hidden="true" />
+                        <a href={`#${w.id}`}>{w.name}</a>
+                      </span>
+                    </th>
+                    {matrixRungs.map((r) => {
+                      const cell = cellOf(w.id, r.n);
+                      return (
+                        <td role="cell">
+                          <a class="cm-node" href={`#${competencyCellId(w.id, r.n)}`}>
+                            <span class="label cm-node-rung">
+                              Rung {r.n} · {r.name}
+                            </span>
+                            <span class="cm-node-label">
+                              <span class={swatch(w.layerN)} aria-hidden="true" />
+                              {cell.label}
+                              <span class="visually-hidden">, {w.name}</span>
+                            </span>
+                          </a>
+                        </td>
+                      );
+                    })}
+                    {i === 0 && (
+                      <td role="cell" class="cm-end" rowspan={workflows.length} aria-rowspan={workflows.length}>
+                        <a class="cm-node cm-node--end" href="#function">
+                          <span class="label cm-node-rung">Rung {top.n}</span>
+                          <span class="cm-node-name">{top.name}</span>
+                          <span class="cm-node-label">{functionLabel}</span>
+                        </a>
+                      </td>
+                    )}
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="credit">Mat: {matCredit}</p>
     </section>
 
     <section class="res-section" aria-labelledby="cm-detail-heading">
@@ -160,15 +207,25 @@ const top = rungs[rungs.length - 1];
       {
         workflows.map((w) => (
           <article id={w.id} class="cm-wf" aria-labelledby={`${w.id}-h`}>
-            <h3 id={`${w.id}-h`}>{w.name}</h3>
-            <p class="cm-note">{layerLabel(w.layerN)}</p>
+            <div class="cm-wf-head">
+              <h3 id={`${w.id}-h`}>{w.name}</h3>
+              <span class="cm-wf-layer">
+                <span class={swatch(w.layerN)} aria-hidden="true" />
+                <span class="cm-note">{layerLabel(w.layerN)}</span>
+              </span>
+              <a class="cm-back" href="#cm-table-heading">Back to the roadmap</a>
+            </div>
             <SkillsTable skills={[skillsFor(w.id)]} />
+            <div class="cm-steps">
             {matrixRungs.map((r) => {
               const cell = cellOf(w.id, r.n);
               return (
                 <section id={competencyCellId(w.id, r.n)} class="cm-cell" aria-labelledby={`${competencyCellId(w.id, r.n)}-h`}>
                   <h4 id={`${competencyCellId(w.id, r.n)}-h`}>
-                    {w.name}, rung {r.n}: {r.name}
+                    <span class="visually-hidden">{w.name}, </span>
+                    <span class="label cm-step-n">Rung {r.n}</span>
+                    <span class="visually-hidden">: </span>
+                    <span class="cm-step-name">{r.name}</span>
                   </h4>
                   <p>{cell.can}</p>
                   <p>
@@ -187,6 +244,7 @@ const top = rungs[rungs.length - 1];
                 </section>
               );
             })}
+            </div>
           </article>
         ))
       }
@@ -210,6 +268,7 @@ const top = rungs[rungs.length - 1];
           ))
         }
       </ol>
+      <p><a class="cm-back" href="#cm-table-heading">Back to the roadmap</a></p>
     </section>
 
     <section class="res-section prose" aria-labelledby="cm-use-heading">
@@ -271,55 +330,278 @@ const top = rungs[rungs.length - 1];
     font-size: var(--fs-small);
     color: var(--ink-2);
   }
+
+  /* ---------------------------------------------------- Roadmap on a painting */
+  .cm-mat {
+    /* border of anything that carries meaning (node, connector, step line): 3:1 on the panel */
+    --cm-edge: color-mix(in srgb, var(--ink) 52%, var(--panel));
+    padding: clamp(12px, 2.4vw, 32px);
+  }
+  .cm-wf {
+    --cm-edge: color-mix(in srgb, var(--ink) 52%, var(--panel));
+  }
+  .cm-panel {
+    margin-inline: auto;
+    padding: var(--s-4) var(--s-4) var(--s-5);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--r-blk);
+  }
+  .cm-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-4);
+    margin: 0 0 var(--s-5);
+    padding: 0 0 var(--s-4);
+    list-style: none;
+    border-bottom: 1px solid var(--line);
+  }
+  .cm-legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+  .cm-legend .label {
+    color: var(--ink-2);
+  }
+
   .cm-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
   }
   .cm-table th,
   .cm-table td {
-    overflow-wrap: anywhere;
+    padding: 0;
     text-align: left;
-    vertical-align: top;
-    padding: var(--s-3) var(--s-3) var(--s-3) 0;
-    border-top: 1px solid var(--line);
-    font-size: var(--fs-small);
+    font-weight: 400;
   }
   .cm-table thead th {
-    font-family: var(--font-mono);
-    font-size: var(--fs-label);
-    text-transform: uppercase;
-    color: var(--ink-2);
+    padding: 0 var(--s-3) var(--s-3);
+    vertical-align: bottom;
+    overflow-wrap: anywhere;
+    font-size: var(--fs-small);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--ink);
+  }
+  .cm-table thead th:first-child {
+    width: 9rem;
+    padding-left: 0;
+  }
+  .cm-table thead th.cm-col-end {
+    width: 11rem;
   }
   .cm-rung {
     display: block;
+    margin-bottom: 3px;
+    color: var(--accent);
   }
   .cm-table tbody th {
+    padding: var(--s-2) var(--s-3) var(--s-2) 0;
+    vertical-align: middle;
+    font-size: var(--fs-small);
     font-weight: 600;
+    line-height: 1.35;
+    color: var(--ink);
   }
+  .cm-rowname {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s-2);
+  }
+  .cm-rowname .sw {
+    margin-top: 5px;
+  }
+  .cm-rowname a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .cm-rowname a:hover {
+    color: var(--accent);
+  }
+  /* the connector runs behind the nodes, through the padding of the cell */
+  .cm-table tbody td {
+    position: relative;
+    padding: var(--s-2);
+    vertical-align: middle;
+  }
+  .cm-table tbody td:not(.cm-end)::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--cm-edge);
+  }
+  .cm-node {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    box-sizing: border-box;
+    height: 100%;
+    min-height: 4.5rem;
+    padding: var(--s-2) var(--s-3);
+    background: var(--panel);
+    border: 1px solid var(--cm-edge);
+    border-radius: var(--r-ctl);
+    color: var(--ink);
+    text-decoration: none;
+    transition: transform var(--dur) var(--ease);
+  }
+  .cm-node:hover {
+    box-shadow: var(--lift);
+    transform: translateY(-1px);
+  }
+  .cm-node-label {
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-2);
+    overflow-wrap: anywhere;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    line-height: 1.35;
+  }
+  /* the rung is named by the column header on a wide table, and by the node on a narrow one */
+  .cm-node-rung {
+    display: none;
+    color: var(--ink-2);
+  }
+
+  /* the seven tracks meet in one bar, then one connector into the fifth rung */
+  .cm-table td.cm-end {
+    padding: 0 0 0 30px;
+  }
+  .cm-table td.cm-end::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: calc(100% / 14);
+    bottom: calc(100% / 14);
+    width: 1px;
+    background: var(--cm-edge);
+  }
+  .cm-node--end {
+    height: auto;
+    padding: var(--s-3) var(--s-4) var(--s-4);
+    gap: 4px;
+  }
+  .cm-node--end::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    width: 30px;
+    height: 1px;
+    background: var(--cm-edge);
+  }
+  .cm-node--end .cm-node-rung {
+    display: block;
+    color: var(--accent);
+  }
+  .cm-node-name {
+    font-size: var(--fs-body);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  /* ---------------------------------------------------- Detail by workflow */
   .cm-wf {
     margin-block: var(--s-6);
     padding-top: var(--s-3);
     border-top: 1px solid var(--line);
   }
-  .cm-wf h3 {
+  .cm-wf-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-1) var(--s-4);
+  }
+  .cm-wf-head h3 {
     margin: 0;
   }
+  .cm-wf-layer {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+  .cm-back {
+    font-size: var(--fs-small);
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--accent-line);
+    text-underline-offset: 0.22em;
+  }
+  .cm-back:hover {
+    color: var(--accent);
+    text-decoration-color: currentColor;
+  }
+  .cm-wf-head .cm-back {
+    margin-left: auto;
+  }
+  .cm-steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--s-4);
+  }
   .cm-cell {
+    position: relative;
     margin-block: var(--s-4);
     padding: var(--s-3) var(--s-4);
     border: 1px solid var(--line);
-    border-radius: var(--r-sm);
-    background: var(--bg);
+    border-radius: var(--r-blk);
+    background: var(--panel);
+  }
+  .cm-steps > .cm-cell {
+    margin-block: var(--s-4) 0;
   }
   .cm-cell:target {
-    border-color: var(--ink);
+    border-left: 3px solid var(--accent);
+    padding-left: calc(var(--s-4) - 2px);
   }
   .cm-cell h4 {
     margin: 0 0 var(--s-2);
   }
+  /* "Rung n" and the rung name on separate lines, so the node dots and connectors line up */
+  .cm-step-n {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    color: var(--accent);
+  }
+  .cm-step-n::before {
+    content: '';
+    flex: none;
+    width: 9px;
+    height: 9px;
+    border-radius: var(--r-pill);
+    background: var(--panel);
+    border: 2px solid var(--accent);
+  }
+  .cm-step-name {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
   .cm-cell p {
     margin: var(--s-2) 0 0;
     overflow-wrap: anywhere;
+  }
+  /* the stepper line: a hairline between neighbouring steps */
+  .cm-steps > .cm-cell:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 24px;
+    left: 100%;
+    width: var(--s-4);
+    height: 1px;
+    background: var(--cm-edge);
   }
   .cm-function {
     list-style: none;
@@ -332,38 +614,123 @@ const top = rungs[rungs.length - 1];
     color: var(--ink-2);
     margin-right: var(--s-2);
   }
-  @media (max-width: 40rem) {
-    .cm-table thead {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip: rect(0 0 0 0);
+
+  /* ---------------------------------------------------- Narrow */
+  @media (max-width: 60rem) {
+    .cm-panel {
+      padding: var(--s-4) var(--s-3) var(--s-4);
     }
+    /* each track becomes its own vertical path under the workflow name */
     .cm-table,
     .cm-table tbody,
     .cm-table tr,
     .cm-table th,
     .cm-table td {
       display: block;
+    }
+    .cm-table thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+    .cm-table tbody {
+      position: relative;
+      padding-bottom: 9rem;
+    }
+    /* the row is the spine (its left border), so the fifth rung anchors to tbody */
+    .cm-table tbody tr {
+      margin: 0 0 var(--s-5) 7px;
+      padding-left: 21px;
+      border-left: 1px solid var(--cm-edge);
+    }
+    .cm-table tbody th {
+      position: relative;
+      margin-bottom: var(--s-3);
+      padding: 0;
+    }
+    .cm-table tbody th::before {
+      content: '';
+      position: absolute;
+      left: -27px;
+      top: 5px;
+      width: 11px;
+      height: 11px;
+      border-radius: var(--r-pill);
+      background: var(--panel);
+      border: 2px solid var(--accent);
+    }
+    .cm-table tbody td {
+      margin-top: var(--s-2);
+      padding: 0;
+    }
+    .cm-table tbody td:not(.cm-end)::before {
+      top: 50%;
+      left: -21px;
+      right: auto;
+      width: 21px;
+    }
+    .cm-node {
+      height: auto;
+      min-height: 0;
+      padding: var(--s-2) var(--s-3);
+    }
+    .cm-node-rung {
+      display: block;
+    }
+    .cm-node--end {
+      padding: var(--s-3) var(--s-4) var(--s-4);
+    }
+    .cm-table tbody td.cm-end {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: 0;
+      padding: 0 0 0 28px;
+    }
+    .cm-table td.cm-end::before {
+      left: 7px;
+      top: -30px;
+      bottom: auto;
+      height: 30px;
+    }
+    .cm-node--end::before {
+      right: auto;
+      left: -28px;
+      top: 18px;
+      width: 11px;
+      height: 11px;
+      border-radius: var(--r-pill);
+      background: var(--panel);
+      border: 2px solid var(--accent);
+    }
+
+    /* detail: steps stack, the connector turns vertical */
+    .cm-steps {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .cm-steps > .cm-cell:not(:last-child)::after {
+      top: 100%;
+      left: 20px;
+      width: 1px;
+      height: var(--s-4);
+    }
+    .cm-wf-head .cm-back {
+      margin-left: 0;
       width: 100%;
     }
-    .cm-table tr {
-      border-top: 1px solid var(--line);
-      padding-block: var(--s-3);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cm-node {
+      transition: none;
     }
-    .cm-table th,
-    .cm-table td {
-      border-top: 0;
-      padding: var(--s-1) 0;
-    }
-    .cm-table td::before {
-      content: attr(data-label);
-      display: block;
-      font-family: var(--font-mono);
-      font-size: var(--fs-label);
-      text-transform: uppercase;
-      color: var(--ink-2);
+    .cm-node:hover {
+      transform: none;
     }
   }
 </style>
