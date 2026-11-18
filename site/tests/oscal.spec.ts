@@ -15,6 +15,9 @@ test('the OSCAL catalog and profiles carry exactly the controls of /api/v1/contr
   const api = readJson('api', 'v1', 'controls.json');
   const apiControls: { id: string; profile: string }[] = api.controls;
   const apiProfiles: { slug: string }[] = api.profiles;
+  // Two empty lists would compare equal: make sure there is something to compare.
+  expect(apiProfiles.length).toBeGreaterThan(0);
+  expect(apiControls.length).toBeGreaterThan(0);
 
   const catalog = readJson('oscal', 'catalog.json').catalog;
   const catalogIds = catalog.groups.flatMap((g: Json) => g.controls.map((c: Json) => c.id));

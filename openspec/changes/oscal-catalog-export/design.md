@@ -42,9 +42,9 @@ envolverlos y dejarían de ser OSCAL.
 sus controles dentro, en el orden de los datos. Por control: `id` tal cual (es un token válido),
 `class: "aige"`, `title`; `props` estándar `label` y `sort-id`, y con el espacio de nombres propio
 `layer`, `status`, `reviewer-status`, `depth` y `version`; `parts`: `statement` con el objetivo,
-`guidance` con el alcance y las notas de implementación, y partes con espacio de nombres propio para
-modos de fallo, verificación (con su tipo), evidencia (con capa y enlace al esquema cuando existe) y
-respuesta ante fallo; `links`: `canonical` a la página del control y `reference` a sus fuentes. Los
+`guidance` con las notas de implementación, y partes con espacio de nombres propio para el alcance,
+los modos de fallo, la verificación (con su tipo), la evidencia (con capa y enlace al esquema cuando
+existe) y la respuesta ante fallo; `links`: `canonical` a la página del control y `reference` a sus fuentes. Los
 mapeos a marcos no van en el catálogo: van en el `mapping-collection`.
 
 **D3. Perfiles.** Un `profile` por perfil del sitio: `imports` con `href` absoluto al catálogo e
@@ -58,11 +58,16 @@ propio, `label` con la referencia original). La procedencia declara `method: hum
 del explorador: aquí cada par está escrito a mano en los datos del control, no generado a partir de
 temas compartidos. El `id-ref` del destino debe ser un token: se normaliza con la misma regla que
 `clauseId()` del crosswalk temático. Para NIST SP 800-53 el destino es la familia, que es lo que
-citan los datos.
+citan los datos, y lleva una propiedad `granularity` con valor `family`. El recurso destino declara
+que su `href` es el texto canónico del marco y no un catálogo OSCAL, y que los `id-ref` son los
+identificadores de cláusula de este sitio: pueden no coincidir con los de un catálogo OSCAL que
+publique el emisor, como hacen NIST para SP 800-53 y CSA para el AICM.
 
 **D5. Determinismo.** Los `uuid` son UUID v5 de un espacio de nombres fijo y una clave estable
-(tipo de documento, identificador, y para cada par origen y destino). `last-modified` es la fecha
-`updated` más reciente de los perfiles incluidos, a las 00:00:00Z. Nada depende del reloj.
+(tipo de documento, identificador, y para cada par origen y destino). El `uuid` raíz de cada
+documento incluye además su versión y su fecha, para que cambie con cada revisión. `last-modified`
+es la fecha `updated` más reciente de los perfiles incluidos, a las 00:00:00Z. Nada depende del
+reloj.
 
 **D6. Metadatos.** `oscal-version: 1.2.3`; título con "illustrative, not a claim of conformity";
 `version` del sitio; autor como `party` con rol `creator`; DOI de concepto en `document-ids`;
@@ -88,7 +93,9 @@ puerta de D7, no una prueba duplicada.
 
 **D10. Dónde se anuncia.** Una sección "OSCAL" en `/resources/data` (qué es cada fichero, versión,
 qué significa `intersects-with`, cómo se valida, licencia), un enlace de descarga en `/controls` con
-el evento `download`, y una entrada en `llms.txt`.
+el evento `control-download` que ya usan las demás descargas de esa página, y una entrada en
+`llms.txt`. Los ficheros se sirven con las mismas cabeceras que `/api/v1` (CORS abierto, sin
+indexar).
 
 ## Risks / Trade-offs
 

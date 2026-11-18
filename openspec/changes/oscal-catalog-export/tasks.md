@@ -22,6 +22,6 @@
 
 ## 5. Revisión y entrega
 
-- [ ] 5.1 Revisión con `code-reviewer` (forma OSCAL, determinismo, pruebas); verificar que no quedan hallazgos críticos ni altos
+- [x] 5.1 Revisión con `code-reviewer` (forma OSCAL, determinismo, pruebas); verificar que no quedan hallazgos críticos ni altos
 - [ ] 5.2 Abrir el PR y esperar la CI; verificar que termina en verde
 - [ ] 5.3 Tras el merge, comprobar en producción los 7 ficheros (`200`, JSON) y validar el catálogo descargado contra el esquema

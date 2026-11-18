@@ -105,6 +105,10 @@ function main() {
     for (const [name, doc] of Object.entries(docs)) {
       if (doc.root === 'profile') {
         profileCount++;
+        const href = doc.body.imports[0]?.href ?? '';
+        if (!href.endsWith('/oscal/catalog.json')) {
+          fail(name, '/profile/imports/0/href', `must import the catalog (ends with /oscal/catalog.json), found ${href}`);
+        }
         doc.body.imports.forEach((imp, i) =>
           (imp['include-controls'] ?? []).forEach((sel, j) =>
             (sel['with-ids'] ?? []).forEach((id, k) => {

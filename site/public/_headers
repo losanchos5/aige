@@ -58,6 +58,11 @@
   Cache-Control: public, max-age=3600
 /api/v1/schemas/*
   Content-Type: application/schema+json; charset=utf-8
+/oscal/*
+  ! Link
+  X-Robots-Tag: noindex
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=3600
 /resources/obligations.json
   ! Link
   X-Robots-Tag: noindex

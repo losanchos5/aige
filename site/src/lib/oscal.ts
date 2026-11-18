@@ -139,7 +139,8 @@ function controlParts(c: Control): Json[] {
   const custom = (name: string, body: Json) => part(name, { ns: OSCAL_NS, ...body });
   const list = [
     part('statement', { id: `${c.id}_smt`, prose: prose(c.objective) }),
-    part('guidance', { id: `${c.id}_gdn`, prose: prose(c.scope, ...c.implementationNotes) }),
+    custom('scope', { prose: prose(c.scope) }),
+    part('guidance', { id: `${c.id}_gdn`, prose: prose(...c.implementationNotes) }),
     custom('failure-modes', {
       parts: c.failureModes.map((text) => custom('failure-mode', { prose: prose(text) })).filter(Boolean),
     }),
@@ -195,7 +196,7 @@ function oscalControl(c: Control): Json {
 export function oscalCatalog(): Json {
   return {
     catalog: {
-      uuid: uuid('catalog'),
+      uuid: uuid('catalog', site.bokVersion, dateTime(controlsUpdated())),
       metadata: metadata({
         title: `${site.name} open control catalog (illustrative, not a claim of conformity)`,
         updated: controlsUpdated(),
@@ -226,7 +227,7 @@ export function oscalProfile(slug: string): Json {
   if (!p) throw new Error(`oscal: unknown profile ${slug}`);
   return {
     profile: {
-      uuid: uuid('profile', p.slug),
+      uuid: uuid('profile', p.slug, p.version, dateTime(p.updated)),
       metadata: metadata({
         title: `${p.title} (illustrative, not a claim of conformity)`,
         updated: p.updated,
@@ -268,7 +269,7 @@ export function oscalControlMappings(): Json {
         href: fw.url ? abs(fw.url) : abs(`${CONTROLS_CROSSWALK_PATH}#${fw.id}`),
         props: [{ name: 'framework-id', ns: OSCAL_NS, value: fw.id }],
         remarks: line(
-          `${fw.name}. ${fw.note ?? ''} href points to the canonical text; the issuer publishes no OSCAL catalog that this collection resolves, so id-refs are the crosswalk clause ids.`,
+          `${fw.name}. ${fw.note ?? ''} href points to the framework's canonical text, not to an OSCAL catalog. id-refs are this site's clause ids for the framework, normalised to tokens; they need not match the ids of an OSCAL catalog the issuer may publish.`,
         ),
       }),
       maps: fw.rows.flatMap((row) =>
@@ -281,7 +282,11 @@ export function oscalControlMappings(): Json {
               type: 'control',
               // The crosswalk's own rule turns a clause reference into a token.
               'id-ref': clauseId({ framework: fw.id, ref: row.ref }),
-              props: [{ name: 'label', ns: OSCAL_NS, value: line(row.ref) }],
+              props: [
+                { name: 'label', ns: OSCAL_NS, value: line(row.ref) },
+                // The crosswalk rows carry no granularity field; SP 800-53 is the one framework whose rows are families.
+                ...(fw.id === 'nist-sp-800-53' ? [{ name: 'granularity', ns: OSCAL_NS, value: 'family' }] : []),
+              ],
               links: row.url ? [{ href: abs(row.url), rel: 'reference' }] : [],
               remarks: line(row.note ? `${row.name} (${row.note})` : row.name),
             }),
@@ -292,7 +297,7 @@ export function oscalControlMappings(): Json {
   );
   return {
     'mapping-collection': {
-      uuid: uuid('mapping-collection', 'controls'),
+      uuid: uuid('mapping-collection', 'controls', site.bokVersion, dateTime(controlsUpdated())),
       metadata: metadata({
         title: `${site.name} open controls mapped to frameworks (illustrative, not a claim of conformity)`,
         updated: controlsUpdated(),

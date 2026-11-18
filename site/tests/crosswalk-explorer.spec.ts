@@ -132,8 +132,12 @@ test('OSCAL download is a 1.2.3 mapping collection marked illustrative', async (
     for (const map of mapping.maps) {
       expect(map.relationship).toBe('intersects-with');
       expect(['medium', 'low']).toContain(map['confidence-score'].category);
-      // The schema types id-ref as a plain string; the catalogs' ids are tokens.
-      for (const item of [...map.sources, ...map.targets]) expect(item['id-ref']).toMatch(TOKEN);
+      // The schema types id-ref as a plain string and also allows type "statement";
+      // the catalogs' ids are tokens and every item here is a control.
+      for (const item of [...map.sources, ...map.targets]) {
+        expect(item.type).toBe('control');
+        expect(item['id-ref']).toMatch(TOKEN);
+      }
     }
   }
   // CSA AICM id-refs follow CSA's own OSCAL catalog ids (A&A-01 -> A_A-01).
