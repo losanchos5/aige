@@ -2,7 +2,7 @@
   "name": "aigovernanceengineer",
   "title": "AI Governance Engineer",
   "description": "Read-only Model Context Protocol server over the open data of aigovernanceengineer.com: the obligation register, the topic crosswalk, the glossary, the governance patterns, the templates and schemas, the open control profiles, and the Body of Knowledge chapters. Every answer carries its source URL. Illustrative, not legal advice and not a claim of conformity.",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "websiteUrl": "https://aigovernanceengineer.com",
   "documentation": "https://aigovernanceengineer.com/mcp",
   "repository": {

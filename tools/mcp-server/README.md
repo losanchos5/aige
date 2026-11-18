@@ -125,8 +125,17 @@ Every setting comes from the environment; invalid values stop the process at sta
   later is served by name anyway (`/schemas/<name>.v1.json` is tried). Run `npm run catalogue`
   after adding a schema or template; `test/resources.test.ts` fails until you do.
 - **Privacy.** Logs are JSON lines: method, path, status, duration and, when the client sends them,
-  the `Mcp-Method` and `Mcp-Name` headers (a tool or resource name). No IP address, user agent,
-  request body or tool argument is logged. The rate limiter keys clients by an HMAC of their
+  the `Mcp-Protocol-Version`, `Mcp-Method` and `Mcp-Name` headers. The last two are logged only when
+  they hold a known method or one of this server's tool names; a resource address or any other text
+  is written as `[other]`. For a POST to `/mcp` they add, from the body, the
+  JSON-RPC method (`rpc`), the tool a `tools/call` names (`tool`) and the name and version the client
+  announces in `initialize` (`client`, `clientVersion`). Each is checked against a list of known
+  values or a strict pattern and written as `[other]` if it fails; nothing else from the body is
+  read into the log. A client can mark its own traffic with `?tag=<label>` on the URL (lowercase
+  letters, digits and hyphens, up to 24 characters; logged as `tag`), so an operator can leave
+  their own use out when counting. The tag is not a secret: anyone can send it, so a count that
+  leaves a tag out is a lower bound. The client address, the user agent and what was asked (tool
+  arguments, search text, the resource read) are never logged. The rate limiter keys clients by an HMAC of their
   address with a secret drawn at start-up, drops each entry when its window closes and forgets
   everything on restart. A client past its limit is logged once per window, not on every refused
   request.
@@ -207,7 +216,7 @@ server's log at three files of 10 MB:
 services:
   aige-mcp:
     build: ./tools/mcp-server
-    image: aige-mcp:0.6.0
+    image: aige-mcp:0.6.1
     restart: unless-stopped
     init: true
     read_only: true

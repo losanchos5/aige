@@ -93,7 +93,7 @@ describe('health and discovery', () => {
     assert.equal(response.status, 200);
     const body = (await response.json()) as Record<string, any>;
     assert.equal(body.status, 'ok');
-    assert.equal(body.version, '0.6.0');
+    assert.equal(body.version, '0.6.1');
     assert.equal(typeof body.upstream.entries, 'number');
     assert.equal(fixtures.hits.size, before);
   });
@@ -357,7 +357,7 @@ describe('logs', () => {
     const lines = running.logs.map((line) => JSON.parse(line) as Record<string, unknown>);
     assert.ok(lines.length > 0);
     const all = running.logs.join('\n');
-    const allowed = new Set(['ts', 'level', 'msg', 'method', 'path', 'status', 'ms', 'mcpMethod', 'mcpName', 'protocol']);
+    const allowed = new Set(['ts', 'level', 'msg', 'method', 'path', 'status', 'ms', 'mcpMethod', 'mcpName', 'protocol', 'rpc', 'tool', 'client', 'clientVersion', 'tag']);
     for (const line of lines.filter((l) => l.msg === 'request')) {
       for (const key of Object.keys(line)) assert.ok(allowed.has(key), `request log field ${key}`);
     }
@@ -368,5 +368,78 @@ describe('logs', () => {
     assert.ok(request, 'the request line names the tool');
     assert.equal(request.status, 200);
     assert.equal(typeof request.ms, 'number');
+  });
+});
+
+describe('logs: what is read from the body', () => {
+  /** The access-log line of the most recent request, as parsed JSON. */
+  const lastRequest = (): Record<string, unknown> => {
+    const lines = running.logs.map((line) => JSON.parse(line) as Record<string, unknown>);
+    return lines.filter((l) => l.msg === 'request').at(-1)!;
+  };
+  const init = (clientInfo: unknown): unknown => ({ ...LEGACY_INIT, params: { ...LEGACY_INIT.params, clientInfo } });
+
+  it('names the announced client, the method and a valid tag', async () => {
+    await post(`${running.url}/mcp?tag=jordi`, init({ name: 'claude-ai', version: '2.1.0' })).then((r) => r.text());
+    assert.deepEqual(
+      { rpc: lastRequest().rpc, client: lastRequest().client, clientVersion: lastRequest().clientVersion, tag: lastRequest().tag },
+      { rpc: 'initialize', client: 'claude-ai', clientVersion: '2.1.0', tag: 'jordi' },
+    );
+  });
+
+  it('writes [other] for a hostile client name and keeps one JSON line, and drops an invalid tag', async () => {
+    await post(`${running.url}/mcp?tag=Bad_Tag!`, init({ name: 'evil\nINJECTED {"level":"error"}', version: 'x'.repeat(65) })).then((r) =>
+      r.text(),
+    );
+    const line = lastRequest();
+    assert.equal(line.client, '[other]');
+    assert.equal(line.clientVersion, '[other]');
+    assert.ok(!('tag' in line));
+    const all = running.logs.join('\n');
+    assert.ok(!all.includes('INJECTED') && !all.includes('Bad_Tag'));
+  });
+
+  it('logs a called tool without the Mcp-Name header, and [other] for an unknown one, never the arguments', async () => {
+    const call = (name: string): unknown => ({ jsonrpc: '2.0', id: 3, method: 'tools/call', params: { name, arguments: { query: 'hidden-argument-value' } } });
+    await post(`${running.url}/mcp`, call('search_glossary'), { 'mcp-protocol-version': '2025-06-18' }).then((r) => r.text());
+    assert.equal(lastRequest().tool, 'search_glossary');
+    await post(`${running.url}/mcp`, call('drop_everything'), { 'mcp-protocol-version': '2025-06-18' }).then((r) => r.text());
+    assert.equal(lastRequest().tool, '[other]');
+    const all = running.logs.join('\n');
+    assert.ok(!all.includes('drop_everything') && !all.includes('hidden-argument-value'));
+  });
+
+  it('writes [other] for a method it does not know and [batch] for an array, never the text sent', async () => {
+    const cases: Array<[unknown, string]> = [
+      [{ jsonrpc: '2.0', id: 4, method: 'secret-method-text' }, '[other]'],
+      [{ jsonrpc: '2.0', id: 5, method: 5 }, '[other]'],
+      [[{ jsonrpc: '2.0', id: 6, method: 'secret-method-text' }], '[batch]'],
+    ];
+    for (const [body, rpc] of cases) {
+      await post(`${running.url}/mcp`, body).then((r) => r.text());
+      assert.equal(lastRequest().rpc, rpc, JSON.stringify(body));
+    }
+    assert.ok(!running.logs.join('\n').includes('secret-method-text'));
+  });
+
+  it('keeps a resource URI or free text sent in the Mcp-Name and Mcp-Method headers out of the log', async () => {
+    await post(`${running.url}/mcp`, LEGACY_INIT, {
+      'mcp-method': 'asked-in-a-header',
+      'mcp-name': 'https://aigovernanceengineer.com/api/v1/obligations/aige-obl-euaia-art9.json',
+    }).then((r) => r.text());
+    const line = lastRequest();
+    assert.deepEqual({ mcpMethod: line.mcpMethod, mcpName: line.mcpName }, { mcpMethod: '[other]', mcpName: '[other]' });
+    const all = running.logs.join('\n');
+    assert.ok(!all.includes('aige-obl-euaia-art9') && !all.includes('asked-in-a-header'));
+  });
+
+  it('answers a non-JSON body as before and logs no method, tool or client', async () => {
+    const response = await post(`${running.url}/mcp`, 'not json at all');
+    const body = (await response.json()) as { error?: { code?: number } };
+    assert.equal(response.status, 400);
+    assert.equal(body.error?.code, -32700);
+    const line = lastRequest();
+    assert.equal(line.status, 400);
+    for (const key of ['rpc', 'tool', 'client', 'clientVersion']) assert.ok(!(key in line), key);
   });
 });
