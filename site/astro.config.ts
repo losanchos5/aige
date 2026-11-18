@@ -84,6 +84,10 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
   // Block b-nav-shell (navigation and site shell): the methodology page states
   // the versions and DOIs from site.ts.
   ['/about/methodology', ['src/pages/about/methodology.astro', 'src/data/site.ts']],
+  // Block listings-readiness: the independence statement, and the privacy page
+  // that names the contact address from site.ts.
+  ['/about/independence', ['src/pages/about/independence.astro']],
+  ['/privacy', ['src/pages/privacy.astro', 'src/data/site.ts']],
   // Block b-c23-agents: the /agents hub routes into chapter 23 and reads the
   // runtime tool categories from the stack data.
   [

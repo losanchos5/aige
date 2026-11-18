@@ -399,9 +399,19 @@ export const GET: APIRoute = async (context) => {
       described('/about/changelog', 'Changelog'),
       described('/about/contributors', 'Contributors'),
       described(
+        '/about/independence',
+        'Independence',
+        'Who pays for the site, what ties its author has and what paid work he may do in the field.',
+      ),
+      described(
         '/contribute',
         'Contribute to open AI controls',
         'How to contribute to the open controls and research notes: issue forms for a control review, a mapping or a correction, and how review works.',
+      ),
+      described(
+        '/privacy',
+        'Privacy',
+        'What the site, the newsletter and the MCP server collect, who receives it, how long it is kept and how to delete it.',
       ),
     ]),
   ];
