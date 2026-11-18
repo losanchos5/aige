@@ -1,18 +1,21 @@
 // crosswalk-explorer.spec.ts: the clause-to-clause explorer on
 // /resources/crosswalk#explore (public/crosswalk-explorer.js). Checks the
 // default view, the shareable fragment, the topic and verified-only filters,
-// the gap view, and the three downloads, including the shape of the OSCAL
-// 1.2.3 mapping collection (required fields per the NIST metaschema:
-// uuid, metadata{title,last-modified,version,oscal-version}, provenance
-// {method,matching-rationale,status,mapping-description}, mappings[] with
-// source-resource, target-resource and maps[] of relationship/sources/targets).
+// the gap view, and the three downloads. The OSCAL 1.2.3 mapping
+// collection is validated against NIST's JSON schema; the assertions beside it
+// cover what the schema cannot (relationship, notice, id-ref tokens, selection).
 import { test, expect, type Page, type Download } from '@playwright/test';
 import { readFileSync } from 'node:fs';
+import Ajv from 'ajv';
 import { topics } from '../src/data/crosswalk';
 
-const UUID = /^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[45][0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12}$/;
 const TOKEN = /^(\p{L}|_)(\p{L}|\p{N}|[.\-_])*$/u;
 const NOTICE = 'not a claim of conformity';
+
+// NIST's own JSON schema (vendored, see scripts/oscal/README.md for the options).
+const validateMapping = new Ajv({ strict: false, validateFormats: false }).compile(
+  JSON.parse(readFileSync('scripts/oscal/oscal_mapping_schema.json', 'utf8')),
+);
 
 async function openExplorer(page: Page, hash = '#explore'): Promise<void> {
   await page.goto(`/resources/crosswalk${hash}`);
@@ -105,15 +108,13 @@ test('OSCAL download is a 1.2.3 mapping collection marked illustrative', async (
   ]);
   expect(dl.suggestedFilename()).toMatch(/\.oscal\.json$/);
   const doc = JSON.parse(await saved(dl));
+  const valid = validateMapping(doc);
+  expect(valid, JSON.stringify(validateMapping.errors, null, 2)).toBe(true);
   const mc = doc['mapping-collection'];
-  expect(Object.keys(doc)).toEqual(['mapping-collection']);
-  expect(mc.uuid).toMatch(UUID);
 
   expect(mc.metadata['oscal-version']).toBe('1.2.3');
   expect(mc.metadata.title).toContain(NOTICE);
   expect(mc.metadata.remarks).toContain(NOTICE);
-  expect(Number.isNaN(Date.parse(mc.metadata['last-modified']))).toBe(false);
-  expect(typeof mc.metadata.version).toBe('string');
 
   expect(mc.provenance).toMatchObject({
     method: 'hybrid',
@@ -125,25 +126,17 @@ test('OSCAL download is a 1.2.3 mapping collection marked illustrative', async (
   // One mapping per source framework with at least one pair.
   expect(mc.mappings).toHaveLength(2);
   for (const mapping of mc.mappings) {
-    expect(mapping.uuid).toMatch(UUID);
     expect(mapping['source-resource'].type).toBe('catalog');
     expect(mapping['target-resource'].type).toBe('catalog');
     expect(mapping['source-resource'].href).toMatch(/^https:\/\//);
-    expect(mapping.maps.length).toBeGreaterThan(0);
     for (const map of mapping.maps) {
-      expect(map.uuid).toMatch(UUID);
       expect(map.relationship).toBe('intersects-with');
       expect(['medium', 'low']).toContain(map['confidence-score'].category);
+      // The schema types id-ref as a plain string and also allows type "statement";
+      // the catalogs' ids are tokens and every item here is a control.
       for (const item of [...map.sources, ...map.targets]) {
         expect(item.type).toBe('control');
         expect(item['id-ref']).toMatch(TOKEN);
-      }
-    }
-    for (const key of ['source-gap-summary', 'target-gap-summary']) {
-      if (!mapping[key]) continue;
-      expect(mapping[key].uuid).toMatch(UUID);
-      for (const sel of mapping[key]['unmapped-controls']) {
-        for (const id of sel['with-ids']) expect(id).toMatch(TOKEN);
       }
     }
   }

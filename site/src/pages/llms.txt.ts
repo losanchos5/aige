@@ -257,6 +257,16 @@ export const GET: APIRoute = async (context) => {
       ),
       page('OpenAPI description', '/api/v1/openapi.json', 'The /api/v1 datasets described as OpenAPI.'),
       page(
+        'OSCAL catalog of the open controls (JSON)',
+        '/oscal/catalog.json',
+        'OSCAL 1.2.3 catalog of the open controls, grouped by control profile. One OSCAL profile per control profile is at /oscal/profiles/<profile>.json.',
+      ),
+      page(
+        'OSCAL mapping of the controls (JSON)',
+        '/oscal/mappings/controls.json',
+        'OSCAL 1.2.3 mapping collection of the controls to the frameworks of the controls crosswalk. Illustrative, not a claim of conformity.',
+      ),
+      page(
         'Glossary (JSON)',
         '/glossary.json',
         'Every term with its definition, chapter references and page URL, as JSON.',

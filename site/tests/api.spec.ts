@@ -171,7 +171,7 @@ test.describe('_headers', () => {
       .replace(/\r/g, '')
       .split(/^(?=\/)/m);
 
-  for (const path of ['/api/v1/*', '/resources/obligations.json', '/resources/crosswalk.json', '/glossary.json']) {
+  for (const path of ['/api/v1/*', '/oscal/*', '/resources/obligations.json', '/resources/crosswalk.json', '/glossary.json']) {
     test(`${path} is CORS-open and cached for an hour`, () => {
       const block = blocks().find((b) => b.startsWith(`${path}\n`));
       expect(block, `no ${path} block`).toBeDefined();

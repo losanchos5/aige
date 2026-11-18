@@ -1,0 +1,32 @@
+// oscal.spec.ts: the OSCAL files carry exactly the controls the open data API
+// carries (checked on the built files, like api.spec.ts: pure Node reads of
+// dist, no browser). Schema validity is the build gate's job
+// (scripts/oscal-check.mjs), so it is not repeated here.
+import { test, expect } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+type Json = Record<string, any>;
+
+const readJson = (...parts: string[]): Json => JSON.parse(readFileSync(join('dist', ...parts), 'utf8'));
+const sorted = (ids: string[]) => [...ids].sort();
+
+test('the OSCAL catalog and profiles carry exactly the controls of /api/v1/controls.json', () => {
+  const api = readJson('api', 'v1', 'controls.json');
+  const apiControls: { id: string; profile: string }[] = api.controls;
+  const apiProfiles: { slug: string }[] = api.profiles;
+  // Two empty lists would compare equal: make sure there is something to compare.
+  expect(apiProfiles.length).toBeGreaterThan(0);
+  expect(apiControls.length).toBeGreaterThan(0);
+
+  const catalog = readJson('oscal', 'catalog.json').catalog;
+  const catalogIds = catalog.groups.flatMap((g: Json) => g.controls.map((c: Json) => c.id));
+  expect(sorted(catalogIds)).toEqual(sorted(apiControls.map((c) => c.id)));
+
+  for (const { slug } of apiProfiles) {
+    const profile = readJson('oscal', 'profiles', `${slug}.json`).profile;
+    expect(sorted(profile.imports[0]['include-controls'][0]['with-ids']), slug).toEqual(
+      sorted(apiControls.filter((c) => c.profile === slug).map((c) => c.id)),
+    );
+  }
+});

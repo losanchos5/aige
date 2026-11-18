@@ -768,7 +768,7 @@ export const datasets: readonly Dataset[] = [
     name: 'crosswalk',
     title: 'Topic crosswalk',
     description:
-      'Twelve governance topics against the clauses of the EU AI Act, ISO/IEC 42001, the NIST AI RMF and the Chinese instruments, joined to the obligation register.',
+      `${topics.length} governance topics against the clauses of ${columns.length} framework columns, among them the EU AI Act, ISO/IEC 42001, the NIST AI RMF and the Chinese instruments, joined to the obligation register.`,
     schemaVersion: 1,
     page: '/resources/crosswalk',
     build: () => ({
