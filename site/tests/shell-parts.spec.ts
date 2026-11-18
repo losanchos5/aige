@@ -208,8 +208,8 @@ test.describe('methodology page', () => {
       ).toHaveCount(1);
     }
     await expect(main.locator('a[href="/about/changelog"]').first()).toBeVisible();
-    // No independence, funding or sponsorship claims on the page.
-    await expect(main).not.toContainText(/sponsor|funded|funding|independen/i);
+    // Funding and independence are the owner's statement on its own page; this one only links it.
+    await expect(main.locator('article a[href="/about/independence"]')).toHaveCount(1);
     // Every citation marker resolves to a numbered source on the page.
     const targets = await main
       .locator('a.cite')

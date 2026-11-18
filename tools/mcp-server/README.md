@@ -273,6 +273,23 @@ mcp.aigovernanceengineer.com {
 After a deploy, check `curl -s https://mcp.aigovernanceengineer.com/healthz` and list the tools
 from a client. Nothing here needs a secret.
 
+## Registry entry
+
+`server.json` is the entry for the official MCP Registry (name `com.aigovernanceengineer/reference`,
+one streamable-http remote). Its `version` must follow the server version in `src/server.ts`;
+`npm test` fails when they differ.
+
+The registry verifies the domain through
+`https://aigovernanceengineer.com/.well-known/mcp-registry-auth`, which holds the public key. The
+private key stays outside the repository. To publish, from `tools/mcp-server`, with `key.pem` being
+that Ed25519 private key:
+
+```bash
+MCP_PRIVATE_KEY="$(openssl pkey -in key.pem -noout -text | sed -n '/priv:/,/pub:/p' | sed '1d;$d' | tr -d ' :\n')" \
+  mcp-publisher login http --domain aigovernanceengineer.com
+mcp-publisher publish
+```
+
 ## Licence and attribution
 
 The data the server returns is the AI Governance Engineer Body of Knowledge, CC BY 4.0: credit

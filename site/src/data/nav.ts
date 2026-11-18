@@ -367,9 +367,20 @@ export const nav: NavGroup[] = [
         description: 'How sources are chosen and tagged, dates kept current and errors corrected.',
       },
       {
+        label: 'Independence',
+        href: '/about/independence',
+        description: 'Who pays for the site, what ties its author has and how paid work is announced.',
+      },
+      {
         label: 'Contribute',
         href: '/contribute',
         description: 'Propose a control, an implementation, a mapping or a correction; how review works.',
+      },
+      {
+        label: 'Privacy',
+        href: '/privacy',
+        description: 'What the site, the newsletter and the MCP server collect, and how to delete it.',
+        placement: 'footer',
       },
     ],
   },

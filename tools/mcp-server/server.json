@@ -1,0 +1,10 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "com.aigovernanceengineer/reference",
+  "title": "AI Governance Engineer",
+  "description": "Read-only AI governance reference: obligations, crosswalks, controls, glossary, patterns, chapters.",
+  "version": "0.6.1",
+  "websiteUrl": "https://aigovernanceengineer.com/mcp",
+  "repository": { "url": "https://github.com/losanchos5/aige", "source": "github", "subfolder": "tools/mcp-server" },
+  "remotes": [{ "type": "streamable-http", "url": "https://mcp.aigovernanceengineer.com/mcp" }]
+}

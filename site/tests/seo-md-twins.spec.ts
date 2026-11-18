@@ -178,6 +178,13 @@ test.describe('_headers: /.well-known', () => {
     });
   }
 
+  // The MCP Registry reads this file to verify the domain: one public-key line, as plain text.
+  test('/.well-known/mcp-registry-auth is one ed25519 key line served as text/plain', () => {
+    const path = '/.well-known/mcp-registry-auth';
+    expect(readFileSync(join('dist', path), 'utf8').trim()).toMatch(/^v=MCPv1; k=ed25519; p=[A-Za-z0-9+/]{43}=$/);
+    expect(headersFor(path).headers.get('content-type')).toEqual(['text/plain; charset=utf-8']);
+  });
+
   for (const path of ['/.well-known/llms.txt', '/.well-known/security.txt', '/.well-known/missing/x']) {
     test(`${path} (a 404) is not labelled JSON`, () => {
       expect(headersFor(path).headers.get('content-type') ?? []).toEqual([]);
