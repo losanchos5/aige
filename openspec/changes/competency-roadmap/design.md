@@ -72,5 +72,5 @@ Ver `proposal.md` (Why). Estado de partida en origin/main `6f58743`:
 - [Esta máquina se queda sin memoria con una compilación más Playwright] → no se compila en local:
   se sube la rama y se lee CI. Las capturas de la página real las toma la sesión principal con un
   solo `astro dev` y una sola página de Playwright, nunca a la vez que otra tarea pesada.
-- [El PR #112 mueve `openspec/changes/competency-matrix` a `openspec/specs/`] → este cambio no toca
-  esos ficheros; si #112 se fusiona antes, basta con rebasar.
+- [El PR #112 movió `openspec/changes/competency-matrix` a `openspec/specs/`] → este cambio no toca
+  esos ficheros; la rama se rebasó sobre main tras su fusión (2026-11-18).

@@ -37,7 +37,7 @@ como una hoja de cálculo. El mockup aprobado está en
 
 Ninguna. Los requisitos de `competency-matrix` (tabla con cabeceras, anclas estables, lectura sin
 JavaScript, sin desplazamiento lateral a 390 px, ninguna certificación como evidencia) se mantienen
-tal cual; ese cambio sigue pendiente de archivar (PR #112) y este no depende de que se fusione.
+tal cual (spec `openspec/specs/competency-matrix`, archivada con el PR #112).
 
 ## Impact
 
