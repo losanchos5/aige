@@ -11,7 +11,7 @@ import Citation from '../../components/Citation.astro';
 import { site } from '../../data/site';
 import { obligations, frameworks, disclaimer, OBLIGATION_ID_PATTERN } from '../../data/frameworks';
 import { datasets, API_PATH, SCHEMA_BASE, allSchemas } from '../../lib/api';
-import { controls, controlSlug } from '../../data/controls';
+import { controls, controlSlug, profiles } from '../../data/controls';
 import { breadcrumbJsonLd } from '../../lib/breadcrumbs';
 import {
   authorNodes,
@@ -323,6 +323,41 @@ curl -s ${site.url}${API_PATH}/obligations.json \\
         <li><a href="/glossary.json"><code>/glossary.json</code></a> (short definitions for hover cards)</li>
         <li>The governance templates and their JSON Schemas on the <a href="/resources/templates">templates page</a></li>
       </ul>
+    </section>
+
+    <section class="res-section prose" aria-labelledby="dt-oscal">
+      <h2 id="dt-oscal">OSCAL</h2>
+      <p>
+        The open controls are also published in OSCAL 1.2.3, the NIST format for machine-readable
+        controls, under the same licence as the rest of the data ({site.license}). Three kinds of
+        file, each generated from the data on this site:
+      </p>
+      <ul>
+        <li>
+          <a href="/oscal/catalog.json" download data-umami-event="download" data-umami-event-file="/oscal/catalog.json" data-umami-event-location="data"><code>/oscal/catalog.json</code></a>:
+          a catalog of the open controls, grouped by control profile.
+        </li>
+        <li>
+          One profile per control profile, which selects that profile's controls from the catalog:
+          {profiles.map((p, i) => (
+            <>
+              {i > 0 && ', '}
+              <a href={`/oscal/profiles/${p.slug}.json`} download data-umami-event="download" data-umami-event-file={`/oscal/profiles/${p.slug}.json`} data-umami-event-location="data"><code>{p.slug}</code></a>
+            </>
+          ))}.
+        </li>
+        <li>
+          <a href="/oscal/mappings/controls.json" download data-umami-event="download" data-umami-event-file="/oscal/mappings/controls.json" data-umami-event-location="data"><code>/oscal/mappings/controls.json</code></a>:
+          the mapping of the controls to the frameworks of the <a href="/controls/crosswalk">controls crosswalk</a>, as an OSCAL mapping collection.
+        </li>
+      </ul>
+      <p>
+        The files are checked at build time against the JSON schemas NIST publishes for OSCAL
+        1.2.3. In the mapping, the relation <code>intersects-with</code> means that a control and a
+        clause deal with the same topic. It does not mean that meeting one meets the other. Custom
+        properties use the namespace <code>https://aigovernanceengineer.com/ns/oscal</code>. The
+        files are not a claim of conformity.
+      </p>
     </section>
 
     <section class="res-section prose" aria-labelledby="dt-mcp">
