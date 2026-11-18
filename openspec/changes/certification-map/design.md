@@ -56,7 +56,8 @@ Ver `proposal.md` (Why). Estado de partida en origin/main `6f58743`:
 1. **Módulo de datos `site/src/data/certifications.ts`.** Un array tipado con la forma de
    `certs.json` (`id`, `issuer`, `name`, `acronym`, `type`, `typeNote`, `status`, `statusNote`,
    `lane`, `band`, `requirementText`, `requires`, `issuerLevel`, `price`, `governanceDomain`, `url`,
-   `asOf`, `unverified`, `scope`), las etiquetas de temas y franjas, y `certificationProblems(today)`.
+   `asOf`, `unverified`, `scope`) más `short` opcional (el texto de la caja cuando no hay
+   acrónimo), las etiquetas de temas y franjas, y `certificationProblems(today)`.
    TypeScript y no JSON porque es el patrón del resto de `site/src/data` y `link-rot` ya lo cubre.
 2. **Comprobación al compilar.** La página llama a `certificationProblems()` y falla si devuelve
    algo: ids únicos, `url` con https, `asOf` con fecha ISO no futura, valores dentro de las listas
