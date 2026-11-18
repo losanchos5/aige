@@ -2,8 +2,8 @@
 
 ## 1. Preparación
 
-- [ ] 1.1 Declarar `ajv` en `devDependencies` de `site/package.json` con la versión ya instalada y actualizar solo el lockfile; verificar que `npm ci --dry-run` no pide cambios
-- [ ] 1.2 Copiar a `site/scripts/oscal/` los esquemas JSON de catálogo, perfil y mapeo de OSCAL v1.2.3 con un `README` (URL de origen, licencia CC0, SHA-256); verificar los hashes contra los ficheros de la release
+- [x] 1.1 Declarar `ajv` en `devDependencies` de `site/package.json` con la versión ya instalada y actualizar solo el lockfile; verificar que `npm ci --dry-run` no pide cambios
+- [x] 1.2 Copiar a `site/scripts/oscal/` los esquemas JSON de catálogo, perfil y mapeo de OSCAL v1.2.3 con un `README` (URL de origen, licencia CC0, SHA-256); verificar los hashes contra los ficheros de la release
 
 ## 2. Generación
 
