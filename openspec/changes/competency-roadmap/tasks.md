@@ -14,13 +14,13 @@
 
 ## 2. Página
 
-- [ ] 2.1 Redibujar la `<table>` de la sección de la matriz como siete vías con roles ARIA
+- [x] 2.1 Redibujar la `<table>` de la sección de la matriz como siete vías con roles ARIA
       explícitos, conectores y el nodo del quinto peldaño (`rowspan`, enlace a `#function`), con el
       CSS portado de `roadmap.css` del mockup y solo tokens del sitio; verificar que no queda ningún
       color en hexadecimal en el CSS nuevo y que los 28 enlaces apuntan a `#<workflow>-r<n>`.
-- [ ] 2.2 Envolver el recorrido en el panel sobre pintura (`Painting.astro`, `.mat`, `.credit`) con
+- [x] 2.2 Envolver el recorrido en el panel sobre pintura (`Painting.astro`, `.mat`, `.credit`) con
       la leyenda de capas encima; verificar que no hay texto fuera del panel opaco.
-- [ ] 2.3 Pasar el detalle de cada flujo a cuatro pasos (rejilla, "Rung n" y nombre en líneas
+- [x] 2.3 Pasar el detalle de cada flujo a cuatro pasos (rejilla, "Rung n" y nombre en líneas
       separadas, borde de acento en `:target`, enlace "Back to the roadmap") conservando
       `SkillsTable`; verificar que cada `article` mantiene su `id` y sus cuatro `section` con los ids
       actuales.
@@ -29,7 +29,7 @@
 
 ## 3. Pruebas
 
-- [ ] 3.1 Leer `C:/Users/Jordi/.claude/skills/test-audit/SKILL.md` y pasar por su puerta las pruebas
+- [x] 3.1 Leer `C:/Users/Jordi/.claude/skills/test-audit/SKILL.md` y pasar por su puerta las pruebas
       candidatas: cada estación y el nodo final enlazan a un id que existe en la página; una fila
       expone su cabecera de flujo y sus cabeceras de peldaño en el árbol de accesibilidad. Verificar
       que solo se añaden las que pasan la puerta y que las aserciones actuales de

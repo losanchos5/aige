@@ -4,7 +4,7 @@
 // consumer observe: a cell permalink lands on that cell, nothing needs
 // JavaScript, axe, no sideways scroll on a phone, and the API dataset carries
 // the same cells as the page.
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import {
   COMPETENCIES_PATH,
@@ -61,6 +61,27 @@ test.describe('competency matrix: page', () => {
       expect(result.violations.map((v) => `${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);
     });
   }
+});
+
+test.describe('competency matrix: roadmap', () => {
+  const roadmap = (page: Page) => page.getByRole('table', { name: /Competency roadmap/ });
+
+  test('every node links to a section on the page, and the fifth rung to the function band', async ({ page }) => {
+    await page.goto(PAGE);
+    const hrefs = await roadmap(page).getByRole('link').evaluateAll((links) => links.map((a) => a.getAttribute('href') ?? ''));
+    for (const cell of competencyCells) expect(hrefs).toContain(`#${competencyCellId(cell.workflow, cell.rung)}`);
+    expect(hrefs).toContain('#function');
+    const dangling = await page.evaluate((all) => all.filter((h) => !document.getElementById(h.slice(1))), hrefs);
+    expect(dangling).toEqual([]);
+  });
+
+  test('the table keeps its row, column and cell semantics after the restyle', async ({ page }) => {
+    await page.goto(PAGE);
+    const table = roadmap(page);
+    await expect(table.getByRole('columnheader')).toContainText(['Workflow', ...rungs.map((r) => `Rung ${r.n}`)]);
+    await expect(table.getByRole('rowheader')).toContainText(workflows.map((w) => w.name));
+    await expect(table.getByRole('cell')).toHaveCount(competencyCells.length + 1);
+  });
 });
 
 test.describe('competency matrix: without JavaScript', () => {
