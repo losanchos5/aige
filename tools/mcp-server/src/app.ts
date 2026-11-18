@@ -51,6 +51,43 @@ function loggable(value: string | undefined): string | undefined {
   return /^[A-Za-z0-9_./:#-]{1,120}$/.test(value) ? value : '[other]';
 }
 
+const RPC_METHODS: ReadonlySet<string> = new Set([
+  'initialize',
+  'ping',
+  'tools/list',
+  'tools/call',
+  'resources/list',
+  'resources/templates/list',
+  'resources/read',
+  'subscriptions/listen',
+  'notifications/initialized',
+  'notifications/cancelled',
+]);
+const TOOLS: ReadonlySet<string> = new Set(TOOL_NAMES);
+const CLIENT_TEXT = /^[A-Za-z0-9 _./:()+@-]{1,64}$/;
+const TAG = /^[a-z0-9-]{1,24}$/;
+
+type BodyLog = { rpc?: string; tool?: string; client?: string; clientVersion?: string };
+
+/** The only parts of a POST body that may reach the log: each is from a closed list or a strict pattern. */
+function bodyLog(body: string, kind: 'batch' | 'listen' | 'other'): BodyLog {
+  if (kind === 'batch') return { rpc: '[batch]' };
+  try {
+    const msg = JSON.parse(body) as { method?: unknown; params?: { name?: unknown; clientInfo?: { name?: unknown; version?: unknown } } };
+    if (typeof msg.method !== 'string') return {};
+    const out: BodyLog = { rpc: RPC_METHODS.has(msg.method) ? msg.method : '[other]' };
+    if (msg.method === 'tools/call') out.tool = typeof msg.params?.name === 'string' && TOOLS.has(msg.params.name) ? msg.params.name : '[other]';
+    if (msg.method === 'initialize') {
+      const text = (v: unknown): string => (typeof v === 'string' && CLIENT_TEXT.test(v) ? v : '[other]');
+      out.client = text(msg.params?.clientInfo?.name);
+      out.clientVersion = text(msg.params?.clientInfo?.version);
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
 function hostOf(header: string | undefined): string | null {
   if (!header) return null;
   try {
@@ -138,10 +175,14 @@ export function createApp(deps: AppDeps): App {
 
   const app = new Hono();
 
-  // Access log: no IP, no user agent, no body, no arguments.
+  // What the /mcp handler read from each POST body, for the access log.
+  const bodyLogs = new WeakMap<Request, BodyLog>();
+
+  // Access log: no IP, no user agent, no arguments; of the body only bodyLog()'s fields.
   app.use('*', async (c, next) => {
     const started = performance.now();
     await next();
+    const tag = c.req.query('tag');
     const fields = {
       method: c.req.method,
       path: c.req.path,
@@ -150,6 +191,8 @@ export function createApp(deps: AppDeps): App {
       mcpMethod: loggable(c.req.header('mcp-method')),
       mcpName: loggable(c.req.header('mcp-name')),
       protocol: loggable(c.req.header('mcp-protocol-version')),
+      ...bodyLogs.get(c.req.raw),
+      ...(tag !== undefined && TAG.test(tag) ? { tag } : {}),
     };
     if (c.req.path === '/healthz') logger.debug('request', fields);
     else logger.info('request', fields);
@@ -208,7 +251,9 @@ export function createApp(deps: AppDeps): App {
     let longLived = false;
     if (c.req.method === 'POST') {
       // The body is at most MAX_BODY_BYTES here (bodyLimit ran first); the SDK reads the original.
-      const kind = messageKind(await c.req.raw.clone().text());
+      const text = await c.req.raw.clone().text();
+      const kind = messageKind(text);
+      bodyLogs.set(c.req.raw, bodyLog(text, kind));
       if (kind === 'batch') {
         return c.json(jsonRpcError(-32600, 'JSON-RPC batch requests are not supported; send one message per POST.'), 400);
       }

@@ -10,7 +10,7 @@ import { registerResources } from './resources.js';
 import { registerTools } from './tools/index.js';
 
 export const SERVER_NAME = 'aigovernanceengineer';
-export const SERVER_VERSION = '0.6.0';
+export const SERVER_VERSION = '0.6.1';
 
 export const INSTRUCTIONS = [
   'Read-only access to the open data of aigovernanceengineer.com, the reference site of AI governance engineering:',
