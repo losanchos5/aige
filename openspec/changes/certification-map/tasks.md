@@ -13,7 +13,7 @@
       etiquetas de temas y franjas, con las notas de estado limpias de texto que no venga del
       emisor; verificar el recuento (51 con `scope: 'core'`, 33 de proveedores) y que no está
       ninguno de los cinco ids excluidos.
-- [ ] 1.4 Escribir `certificationProblems(today)` con las reglas de la decisión 2 de `design.md` y
+- [x] 1.4 Escribir `certificationProblems(today)` con las reglas de la decisión 2 de `design.md` y
       la antigüedad de doce meses; verificar, cargando el módulo sin compilar (Vite `ssrLoadModule`,
       ver `D:/Documents/aige-wt/handoffs/oscal/gen.mjs`), que los datos reales no dan problemas y
       que una entrada sin `url`, otra sin `asOf` y otra con una franja inventada dan un problema
