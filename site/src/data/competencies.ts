@@ -39,6 +39,8 @@ export interface CompetencyCell {
   /** Id of a workflow in role.ts. */
   workflow: string;
   rung: 1 | 2 | 3 | 4;
+  /** Two to four words for the roadmap station; never claims more than `can`. */
+  label: string;
   /** What the person can own end to end (40 words at most). */
   can: string;
   /** The artefact visible in the systems that shows it (30 words at most). */
@@ -120,6 +122,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'intake-and-classification',
     rung: 1,
+    label: 'Runs the intake',
     can: 'Runs the intake for new systems: fills in the form, applies the existing risk tiers, and opens the registry entry and the impact assessment the tier requires.',
     evidence: 'Intake records with a tier, a linked registry entry and an impact assessment opened for each new system.',
     links: [
@@ -131,6 +134,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'intake-and-classification',
     rung: 2,
+    label: 'Builds intake as code',
     can: 'Builds the intake path for one product area as code: a form that classifies, scaffolds the registry entry and routes the system to the controls its tier needs.',
     evidence: 'A versioned intake definition in the repository that creates a registry entry and the tier tasks on submit.',
     links: [
@@ -142,6 +146,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'intake-and-classification',
     rung: 3,
+    label: 'Owns one intake path',
     can: 'Owns intake for every team: one risk taxonomy and one intake path that every team adopts as the standard template.',
     evidence: 'Every registry entry traced to an intake record, and median days from intake to go or no-go, by tier, computed from the intake workflow.',
     links: [
@@ -153,6 +158,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'intake-and-classification',
     rung: 4,
+    label: 'Decides tier mapping',
     can: 'Decides how risk tiers map to required controls and who may change the mapping, so every workflow routes by the same rule.',
     evidence: 'A versioned tier-to-controls mapping with its change history, read by intake, gates and registry.',
     links: [
@@ -166,6 +172,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'inventory-and-registry',
     rung: 1,
+    label: 'Registers systems correctly',
     can: 'Registers models and agents correctly, with owner, scope, status and kill switch, and fixes the entries that discovery flags.',
     evidence: 'Registry entries with owner, scope, status and kill switch, and no open discovery mismatch assigned to them.',
     links: [
@@ -176,6 +183,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'inventory-and-registry',
     rung: 2,
+    label: 'Registry wired to deploy',
     can: "Wires the registry to one product area's deploy pipeline so a deploy registers the system, and reconciles the registry against production.",
     evidence: 'A pipeline step that writes the registry entry on deploy, and a reconciliation job that reports unregistered systems.',
     links: [
@@ -187,6 +195,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'inventory-and-registry',
     rung: 3,
+    label: 'Owns the inventory',
     can: 'Owns the inventory for the whole organisation: the registry is the path every team deploys through, and discovery covers the estate.',
     evidence: 'A deploy gate that refuses any system with no registry entry, and registry coverage and unregistered AI found computed from discovery across the estate.',
     links: [
@@ -198,6 +207,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'inventory-and-registry',
     rung: 4,
+    label: 'Decides identity model',
     can: 'Decides the identity model for non-human actors: what counts as an agent, what an owner and a scope are, and how credentials are issued.',
     evidence: 'A published identity model and registry schema that the controls of every workflow reference.',
     links: [
@@ -211,6 +221,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'evals-and-red-teaming',
     rung: 1,
+    label: 'Adds an eval',
     can: 'Adds an eval to an existing suite, runs it in the existing harness and files the result.',
     evidence: 'A merged eval in the suite and a stored, timestamped result for it in the evidence store.',
     links: [
@@ -221,6 +232,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'evals-and-red-teaming',
     rung: 2,
+    label: 'Builds an eval gate',
     can: 'Builds an eval suite for one system class and wires it into CI/CD as a gate that blocks a failing release, with the plan frozen before the first run.',
     evidence: 'A pipeline gate that has failed a build, with its frozen test plan and the failing run.',
     links: [
@@ -233,6 +245,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'evals-and-red-teaming',
     rung: 3,
+    label: 'Owns the shared harness',
     can: 'Owns evals across the organisation: the shared harness, the gate template other teams adopt, and the review of suite quality.',
     evidence: 'A standard gate template in use by several teams, and a quality measure tracked for every gating suite.',
     links: [
@@ -243,6 +256,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'evals-and-red-teaming',
     rung: 4,
+    label: 'Decides what is valid',
     can: 'Decides what counts as a valid eval: the validity standard, how thresholds trace to failure modes, and who may change a threshold.',
     evidence: 'A written eval validity standard that every gate reads, the checks a run must pass before its result counts, and the rule for changing a threshold.',
     links: [
@@ -256,6 +270,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'policy-as-code-and-gates',
     rung: 1,
+    label: 'Runs existing policies',
     can: 'Runs existing policies: updates a policy input, reads a gate decision and reports a block with its logged reason.',
     evidence: 'Gate decision logs with a reason for each block, and the policy input change in the repository.',
     links: [
@@ -266,6 +281,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'policy-as-code-and-gates',
     rung: 2,
+    label: 'Obligation as policy',
     can: 'Turns one obligation into an executable policy in the pipeline of one product area, blocking the merge or the deploy when it fails.',
     evidence: 'A policy file with tests, evaluated in CI, and a blocked merge or deploy log that cites the rule.',
     links: [
@@ -277,6 +293,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'policy-as-code-and-gates',
     rung: 3,
+    label: 'Owns the policy library',
     can: 'Owns the policy library and the gates across the organisation: one policy repository, admission control, and the exception process teams follow.',
     evidence: 'A shared policy repository with owners and versioned releases, and each exception recorded with an expiry date.',
     links: [
@@ -288,6 +305,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'policy-as-code-and-gates',
     rung: 4,
+    label: 'Decides where enforced',
     can: 'Decides where each rule is enforced (CI, admission or runtime) and how policy, gate and exception fit together across the five layers.',
     evidence: 'A reference enforcement map that gives each control class its enforcement point and its exception path.',
     links: [
@@ -300,6 +318,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'runtime-monitoring-and-incidents',
     rung: 1,
+    label: 'Triages alerts',
     can: 'Runs existing monitors: triages guardrail and drift alerts, files incidents in the pipeline and takes part in kill-switch drills.',
     evidence: 'Triaged alerts, each closed with a reason or linked to the incident record it opened, and kill-switch drill records that name them as a participant.',
     links: [
@@ -311,6 +330,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'runtime-monitoring-and-incidents',
     rung: 2,
+    label: 'Instruments one area',
     can: 'Instruments one product area: guardrail decisions and tool calls stream to observability, and alerts trigger the incident pipeline.',
     evidence: 'A dashboard fed by OpenTelemetry traces and an alert rule that opens an incident record.',
     links: [
@@ -323,6 +343,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'runtime-monitoring-and-incidents',
     rung: 3,
+    label: 'Owns the incident process',
     can: 'Owns runtime monitoring and the incident process for the organisation: one detection-to-report path, one severity scale and tested reporting clocks.',
     evidence: 'A runbook with named owners, an incident clock exercised in a drill, and drill records for each high-risk system.',
     links: [
@@ -334,6 +355,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'runtime-monitoring-and-incidents',
     rung: 4,
+    label: 'Decides the incident path',
     can: 'Decides the incident path: how a signal becomes a record, which reports that record feeds, and who can suspend a system.',
     evidence: 'A reference incident record format and escalation path that detection, response and reporting all use.',
     links: [
@@ -347,6 +369,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'assurance-and-audit-evidence',
     rung: 1,
+    label: 'Exports evidence',
     can: 'Produces evidence from controls others built: exports eval results, logs and registry state into the evidence store in the agreed format.',
     evidence: 'Evidence records in the store for each run, carrying a timestamp, a control id and a signature.',
     links: [
@@ -357,6 +380,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'assurance-and-audit-evidence',
     rung: 2,
+    label: 'Builds the evidence step',
     can: 'Builds the evidence step for one control in CI/CD, so the pipeline emits a signed, machine-readable artefact as a by-product of the build.',
     evidence: 'A pipeline step that emits a signed OSCAL or structured record on every run, stored under the control id.',
     links: [
@@ -368,6 +392,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'assurance-and-audit-evidence',
     rung: 3,
+    label: 'Owns the evidence store',
     can: 'Owns assurance across the organisation: the evidence store, live control status, and an internal audit answered by a query.',
     evidence: 'A live control-status view and an audit question answered from the store, with evidence freshness shown for each control.',
     links: [
@@ -379,6 +404,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'assurance-and-audit-evidence',
     rung: 4,
+    label: 'Decides evidence format',
     can: 'Decides the common evidence format and the retention rules that every workflow emits into.',
     evidence: 'A published evidence record schema and retention code that all pipelines validate against.',
     links: [
@@ -391,6 +417,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'regulatory-translation',
     rung: 1,
+    label: 'Traces one obligation',
     can: 'Traces one obligation to a control that already exists: finds the article in the register, then links the control and its evidence.',
     evidence: 'A mapping row from an obligation to an existing control and its evidence artefact, ready for a lawyer to review.',
     links: [
@@ -402,6 +429,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'regulatory-translation',
     rung: 2,
+    label: 'Translates one article',
     can: 'Translates one article into a build, such as a gate, a registry field or an evidence artefact, agreed with a lawyer, and traces it back for the auditor.',
     evidence: 'A merged control whose description cites the article, and the trace from the article to its artefact.',
     links: [
@@ -412,6 +440,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'regulatory-translation',
     rung: 3,
+    label: 'Owns the obligation register',
     can: 'Owns translation across the organisation: the obligation register and the crosswalk stay current as law and frameworks change, and teams build from them.',
     evidence: 'A versioned crosswalk with a dated review for each framework, and controls built by other teams that cite obligation register entries.',
     links: [
@@ -423,6 +452,7 @@ export const competencyCells: readonly CompetencyCell[] = [
   {
     workflow: 'regulatory-translation',
     rung: 4,
+    label: 'Decides the mapping model',
     can: 'Decides the mapping model: how obligations, controls and evidence connect, so one control can serve several frameworks and a change shows what it touches.',
     evidence: 'A control-to-obligation schema where each control carries obligation ids, and a change lists the controls it affects.',
     links: [
@@ -431,6 +461,9 @@ export const competencyCells: readonly CompetencyCell[] = [
     ],
   },
 ];
+
+/** The label of the fifth rung's node on the roadmap. */
+export const functionLabel = 'Owns the function';
 
 export const functionStatements: readonly FunctionStatement[] = [
   {
@@ -456,6 +489,8 @@ export const functionStatements: readonly FunctionStatement[] = [
 const MAX_CAN_WORDS = 40;
 const MAX_EVIDENCE_WORDS = 30;
 const EM_DASH = String.fromCharCode(0x2014);
+const MIN_LABEL_WORDS = 2;
+const MAX_LABEL_WORDS = 4;
 const FORBIDDEN_EVIDENCE = /\b(certif\w*|years?|self[- ]?(assess|rat)\w*)\b/i;
 const words = (s: string) => s.trim().split(/\s+/).filter(Boolean).length;
 
@@ -497,10 +532,19 @@ export function competencyProblems(): string[] {
     if (c.can.includes(EM_DASH) || c.evidence.includes(EM_DASH)) problems.push(`${at}: contains an em dash`);
   };
 
+  const checkLabel = (at: string, label: string) => {
+    const n = words(label);
+    if (n < MIN_LABEL_WORDS || n > MAX_LABEL_WORDS) {
+      problems.push(`${at}: label has ${n} words, expected ${MIN_LABEL_WORDS} to ${MAX_LABEL_WORDS}`);
+    }
+    if (label.includes(EM_DASH)) problems.push(`${at}: label contains an em dash`);
+  };
+
   for (const cell of competencyCells) {
     const at = `${cell.workflow}/r${cell.rung}`;
     if (!workflowIds.has(cell.workflow)) problems.push(`${at}: workflow "${cell.workflow}" is not in role.ts`);
     checkText(at, cell);
+    checkLabel(at, cell.label);
     if (cell.links.length < 1 || cell.links.length > 4) {
       problems.push(`${at}: ${cell.links.length} links, expected 1 to 4`);
     }
@@ -524,6 +568,7 @@ export function competencyProblems(): string[] {
   if (functionStatements.length < 3 || functionStatements.length > 6) {
     problems.push(`function band has ${functionStatements.length} statements, expected 3 to 6`);
   }
+  checkLabel('function', functionLabel);
   functionStatements.forEach((s, i) => checkText(`function/${i + 1}`, s));
 
   return problems;

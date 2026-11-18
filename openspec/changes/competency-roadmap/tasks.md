@@ -2,11 +2,11 @@
 
 ## 1. Datos
 
-- [ ] 1.1 Añadir `label` a `CompetencyCell` y las 28 etiquetas de
+- [x] 1.1 Añadir `label` a `CompetencyCell` y las 28 etiquetas de
       `D:/Documents/aige-media/mockups/competencies-roadmap/labels.json` a `site/src/data/competencies.ts`,
       más la etiqueta del quinto peldaño (clave `function`); verificar que cada celda del módulo tiene
       su etiqueta y que el texto de `can`, `evidence` y `links` no cambia en el diff.
-- [ ] 1.2 Extender `competencyProblems()`: etiqueta presente y de dos a cuatro palabras, también la
+- [x] 1.2 Extender `competencyProblems()`: etiqueta presente y de dos a cuatro palabras, también la
       del quinto peldaño. La página ya llama a esta función al compilar
       (`competencies.astro`); verificar, cargando el módulo sin compilar (Vite `ssrLoadModule`, ver
       `D:/Documents/aige-wt/handoffs/oscal/gen.mjs`), que una etiqueta vacía o de cinco palabras
