@@ -15,7 +15,7 @@ enlazar. La ruta SHALL figurar en `SOURCE_BY_PATH`, en el grupo About de la nave
 - **THEN** enlaza `/about/changelog`, `/about/contributors` y los formularios de issue del
   repositorio, y muestra la versión y el DOI desde `site.ts`
 
-#### Scenario: Sin afirmaciones de independencia propias
+#### Scenario: Sin afirmaciones de independencia inventadas
 - **WHEN** se lee la página
 - **THEN** no hace ninguna declaración de financiación, patrocinio o independencia y enlaza
   `/about/independence`, donde está la del autor
