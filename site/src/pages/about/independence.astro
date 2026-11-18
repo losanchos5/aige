@@ -1,0 +1,117 @@
+---
+/**
+ * /about/independence: who pays for the site, what the author takes and does
+ * not take, and what he may sell. Every sentence is the owner's to confirm;
+ * the "Last reviewed" date moves only when he re-confirms the whole page. Any
+ * paid product or service related to the site is listed here before it launches.
+ */
+import Doc from '../../layouts/Doc.astro';
+import { site } from '../../data/site';
+import { gitDate } from '../../lib/reading';
+
+const reviewed = '2026-11-18';
+const reportForm = `${site.github}/issues/new?template=report-an-error.yml`;
+
+const headings = [
+  { depth: 2, slug: 'who-pays', text: 'Who pays' },
+  { depth: 2, slug: 'what-i-do-not-take', text: 'What I do not take' },
+  { depth: 2, slug: 'whose-project-this-is', text: 'Whose project this is' },
+  { depth: 2, slug: 'what-i-may-sell', text: 'What I may sell' },
+  { depth: 2, slug: 'who-else-is-involved', text: 'Who else is involved' },
+  { depth: 2, slug: 'how-the-lab-frameworks-are-treated', text: 'How the lab frameworks are treated' },
+  { depth: 2, slug: 'how-to-challenge-this', text: 'How to challenge this' },
+];
+
+const title = 'Independence and funding';
+const summary =
+  'Who pays for this site, what I take and do not take, and what I may sell.';
+const description =
+  'Who pays for AI Governance Engineer, what its author takes and does not take, what he may sell in this field, and how to challenge any of it.';
+const updated = gitDate('src/pages/about/independence.astro');
+---
+
+<Doc
+  title={title}
+  summary={summary}
+  description={description}
+  crumbs={[{ label: 'About', href: '/about' }, { label: title }]}
+  headings={headings}
+  updated={updated}
+  navGroup="about"
+  image="/og/about.png"
+>
+  <p>
+    This page says who pays for this site and what ties I have to the field it covers. Each
+    statement on it can be checked or challenged.
+  </p>
+
+  <h2 id="who-pays">Who pays</h2>
+  <p>I pay for this site myself: the domain, the hosting and the tools.</p>
+
+  <h2 id="what-i-do-not-take">What I do not take</h2>
+  <p>
+    The site has no sponsors, no grants, no advertising, no affiliate links and no paid placement.
+    I take no money, access or other support from AI labs, vendors, standards bodies or
+    certification schemes, and I am not affiliated with any of them. The pages that rely on a scheme
+    say so too: the <a href="/controls">open control profiles</a> are not affiliated with AIUC, ISO,
+    NIST or the Cloud Security Alliance, and the <a href="/for/aigp">AIGP map</a> is not affiliated
+    with or endorsed by the IAPP.
+  </p>
+
+  <h2 id="whose-project-this-is">Whose project this is</h2>
+  <p>
+    This is a personal project, written on my own time. It speaks for no employer, and nothing on it
+    discloses an employer's internal detail.
+  </p>
+
+  <h2 id="what-i-may-sell">What I may sell</h2>
+  <p>
+    I work in this field and may be paid for work in it: advisory work, training or software.
+    Nothing is sold on this site. If I offer a paid product or service related to what this site
+    covers, it will be listed on this page before it launches. As of the date below, nothing is
+    listed.
+  </p>
+
+  <h2 id="who-else-is-involved">Who else is involved</h2>
+  <p>
+    I am the sole author of the Body of Knowledge and the site; the Thesis is co-authored with
+    Aurélie Pols. No review of a chapter or dataset has been completed yet, and the
+    <a href="/about/contributors">contributors page</a> asks every reviewer to disclose any
+    commercial interest in a vendor, product or standard the reviewed text names.
+  </p>
+
+  <h2 id="how-the-lab-frameworks-are-treated">How the lab frameworks are treated</h2>
+  <p>
+    The <a href="/resources/frontier-framework-changes">frontier framework changes</a> page describes
+    the labs' published documents; it makes no claim about how any lab applies its framework, and it
+    does not rate any change. Across the site, a claim carried only by a vendor is attributed to that
+    vendor, and tools are named only as examples of a category, never as a recommendation (see
+    <a href="/about/methodology#how-sources-are-chosen">how sources are chosen</a>).
+  </p>
+
+  <h2 id="how-to-challenge-this">How to challenge this</h2>
+  <p>
+    If something here is wrong, or a page reads as favouring someone, use the
+    <a href={reportForm} target="_blank" rel="noopener noreferrer">report an error</a> form or write
+    to <a href={`mailto:${site.email}`}>{site.email}</a>. The
+    <a href="/about/methodology#corrections-and-contributions">corrections process</a> and
+    <a href="/contribute">how to contribute</a> say how reports are handled. Except where a page
+    notes otherwise, the text and data are licensed <a href={site.licenseUrl}>{site.license}</a>, and
+    the <a href={site.github}>repository</a> is public, so anyone can check them or fork them.
+  </p>
+
+  <p class="reviewed">Last reviewed: <time datetime={reviewed}>{reviewed}</time>.</p>
+</Doc>
+
+<style>
+  /* Authored h2/p in Doc's .prose well: :global(.prose) lifts these over
+     prose.css, as on /about/methodology. */
+  :global(.prose) > h2 {
+    font-size: var(--fs-h2);
+  }
+
+  .reviewed {
+    margin-top: var(--s-6);
+    color: var(--ink-2);
+  }
+</style>
