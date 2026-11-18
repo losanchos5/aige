@@ -13,11 +13,22 @@
 import Doc from '../../layouts/Doc.astro';
 import SourceList from '../../components/SourceList.astro';
 import FlowDiagram from '../../components/FlowDiagram.astro';
+import CertificationMap from '../../components/CertificationMap.astro';
+import CertificationVendors from '../../components/CertificationVendors.astro';
+import CertificationFacts from '../../components/CertificationFacts.astro';
 import { aigpBok, aigpDomains, aigpIndicators, rangeText } from '../../data/aigp';
+import { certificationProblems } from '../../data/certifications';
 import { gitDate } from '../../lib/reading';
 import type { Source } from '../../lib/sources';
 import '../../styles/resources.css';
 import '../../styles/aigp.css';
+import '../../styles/cert-map.css';
+
+const today = new Date();
+const problems = certificationProblems(today);
+if (problems.length > 0) {
+  throw new Error(`certifications.ts invariants failed:\n${problems.join('\n')}`);
+}
 
 const CHECKED = '2026-09-24';
 
@@ -173,6 +184,8 @@ const certificateLanes = [
 
 const headings = [
   { depth: 2, slug: 'how-to-read-this-page', text: 'How to read this page' },
+  { depth: 2, slug: 'certification-map', text: 'The core map: subject by prerequisite' },
+  { depth: 2, slug: 'vendor-certifications', text: 'Vendor engineering certifications' },
   { depth: 2, slug: 'two-kinds-of-certificate', text: 'Two kinds of certificate' },
   { depth: 2, slug: 'at-a-glance', text: 'At a glance' },
   { depth: 2, slug: 'aigp', text: 'AIGP (IAPP)' },
@@ -188,6 +201,7 @@ const headings = [
     slug: 'what-a-certificate-shows',
     text: 'What a certificate shows, and what it does not',
   },
+  { depth: 2, slug: 'credential-facts', text: 'The facts, credential by credential' },
   { depth: 2, slug: 'sources', text: 'Sources' },
 ];
 
@@ -213,6 +227,7 @@ const updated = gitDate('src/pages/for/certifications.astro');
   crumbs={[{ label: 'For you', href: '/for' }, { label: 'Certifications' }]}
   headings={headings}
   updated={updated}
+  sidebar={false}
   navGroup="for-you"
   image="/og/resources.png"
 >
@@ -234,6 +249,9 @@ const updated = gitDate('src/pages/for/certifications.astro');
       here.</strong
     >
   </p>
+
+  <CertificationMap />
+  <CertificationVendors />
 
   <h2 id="two-kinds-of-certificate">Two kinds of certificate</h2>
   <figure class="cert-lanes" id="certificate-lanes">
@@ -527,6 +545,8 @@ const updated = gitDate('src/pages/for/certifications.astro');
     record of trainings will do<sup><a class="cite" href={cite(12)}>12</a></sup>. How to run that
     record as code is in <a href="/bok/governance-program#ai-literacy-as-code">chapter 12</a>.
   </p>
+
+  <CertificationFacts today={today} />
 
   <h2 id="sources">Sources</h2>
   <SourceList sources={sources} />

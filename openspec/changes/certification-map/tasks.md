@@ -21,20 +21,20 @@
 
 ## 2. Página
 
-- [ ] 2.1 Mapa de credenciales (variante "columns" del mockup): secciones por tema, listas por
+- [x] 2.1 Mapa de credenciales (variante "columns" del mockup): secciones por tema, listas por
       franja alineadas con subgrid, cajas enlazadas a `#cert-<id>`, leyenda, frase de lectura, panel
       sobre pintura con crédito; CSS portado de `certmap.css` solo con tokens. Verificar que no
       queda ningún color en hexadecimal y que hay 51 cajas.
-- [ ] 2.2 Bloque de proveedores agrupado por proveedor, con nombre, código y nivel en palabras del
+- [x] 2.2 Bloque de proveedores agrupado por proveedor, con nombre, código y nivel en palabras del
       proveedor, etiqueta de retirada con fecha y marca de dominio de gobierno; verificar 33 cajas
       y que ningún nodo muestra solo un código.
-- [ ] 2.3 Hechos por credencial: una tabla por tema con ancla `cert-<id>` por fila, fuente con el
+- [x] 2.3 Hechos por credencial: una tabla por tema con ancla `cert-<id>` por fila, fuente con el
       nombre del host, fecha, línea de datos sin comprobar, texto para precio no publicado, marca de
       entrada antigua, fila `:target` resaltada y enlace de vuelta; verificar que los 84 ids existen
       una sola vez.
 - [ ] 2.4 Vista estrecha: temas apilados con sus franjas y filas de hechos como tarjetas; verificar
       que no hay desplazamiento lateral a 390 px.
-- [ ] 2.5 Integrar en `site/src/pages/for/certifications.astro`: llamada a
+- [x] 2.5 Integrar en `site/src/pages/for/certifications.astro`: llamada a
       `certificationProblems()` al compilar, orden de secciones de la decisión 8, entradas del
       índice, fecha del mapa, enlaces de corrección y nota de no afiliación ampliada; verificar que
       `#certificate-lanes`, `.cert-standard`, `ol.sources` y el título siguen como los fijan las

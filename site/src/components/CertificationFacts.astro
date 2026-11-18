@@ -1,0 +1,110 @@
+---
+/**
+ * CertificationFacts: what each issuer states about each credential, one table
+ * per map lane and one for the vendors. One row per credential, anchored
+ * `cert-<id>` (the map's and the vendor block's boxes link here); the row
+ * lands below the sticky header, takes a 3px accent edge when targeted and
+ * links back. Below 900px the rows are stacked cards. A price the issuer does
+ * not publish says so; fields that could not be read on the issuer's page are
+ * listed in the row. Styles: cert-map.css.
+ */
+import {
+  certifications,
+  factLanes,
+  isStale,
+  sourceHost,
+  statusWords,
+  unverifiedWords,
+} from '../data/certifications';
+
+interface Props {
+  /** The build date, to mark entries read more than twelve months ago. */
+  today: Date;
+}
+const { today } = Astro.props;
+const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
+const columns = ['Credential and issuer', 'Type', 'Status', 'Requirement', 'Price', 'Source', 'As of'];
+const widths = ['19%', '9%', '13%', '24%', '12%', '14%', '9%'];
+---
+
+<h2 id="credential-facts">The facts, credential by credential</h2>
+<p>
+  Each box above links to its row here. Every row says what the issuer states and when it was read.
+</p>
+{
+  factLanes.map((lane) => {
+    const rows = certifications.filter((c) => c.lane === lane.id);
+    return (
+      <>
+        <h3 id={`facts-${lane.id}`}>{lane.label}</h3>
+        <div class="cm-wide">
+          <table class="cm-facts" role="table" aria-labelledby={`facts-${lane.id}`}>
+            <colgroup>{widths.map((w) => <col style={`width:${w}`} />)}</colgroup>
+            <thead role="rowgroup">
+              <tr role="row">
+                {columns.map((col) => <th scope="col" role="columnheader">{col}</th>)}
+              </tr>
+            </thead>
+            <tbody role="rowgroup">
+              {rows.map((c) => {
+                const vendor = c.lane === 'engineering';
+                return (
+                  <tr role="row" id={`cert-${c.id}`}>
+                    <th scope="row" role="rowheader">
+                      <span class="cm-f-name">{c.name}</span>
+                      {c.acronym && <span class="cm-f-ac">{c.acronym}</span>}
+                      <span class="cm-f-iss">{c.issuer}</span>
+                      <a class="cm-back" href={vendor ? '#vendor-certifications' : '#certification-map'}>
+                        {vendor ? 'Back to the vendor certifications' : 'Back to the map'}
+                      </a>
+                    </th>
+                    <td role="cell">
+                      <span class="cm-k">Type</span>
+                      {cap(c.type)}
+                      {c.typeNote && <><br />{c.typeNote}</>}
+                    </td>
+                    <td role="cell">
+                      <span class="cm-k">Status</span>
+                      {statusWords[c.status]}
+                      {c.statusNote && <><br />{c.statusNote}</>}
+                    </td>
+                    <td role="cell">
+                      <span class="cm-k">Requirement</span>
+                      {c.requirementText}
+                      {vendor && c.issuerLevel && (
+                        <p><span class="cm-k2">Issuer level</span> {c.issuerLevel}</p>
+                      )}
+                      {vendor && c.governanceDomain && (
+                        <p><span class="cm-k2">Governance domain</span> {c.governanceDomain}</p>
+                      )}
+                      {c.unverified.length > 0 && (
+                        <p class="cm-unv">
+                          Not verified on the issuer's page: {c.unverified.map((u) => unverifiedWords[u]).join(', ')}.
+                        </p>
+                      )}
+                    </td>
+                    <td role="cell">
+                      <span class="cm-k">Price</span>
+                      {c.price ?? 'Not published by the issuer'}
+                    </td>
+                    <td role="cell" class="cm-src">
+                      <span class="cm-k">Source</span>
+                      <a href={c.url} rel="noopener" set:html={sourceHost(c.url).replace(/\./g, '.<wbr>')} />
+                    </td>
+                    <td role="cell">
+                      <span class="cm-k">As of</span>
+                      {c.asOf}
+                      {isStale(c, today) && (
+                        <span class="cm-tag cm-tag--unv cm-stale">NOT RECENTLY REVIEWED</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </>
+    );
+  })
+}
