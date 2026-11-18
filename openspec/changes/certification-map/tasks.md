@@ -56,7 +56,7 @@
 
 ## 4. Pruebas
 
-- [ ] 4.1 Leer `C:/Users/Jordi/.claude/skills/test-audit/SKILL.md` y pasar por su puerta las pruebas
+- [x] 4.1 Leer `C:/Users/Jordi/.claude/skills/test-audit/SKILL.md` y pasar por su puerta las pruebas
       candidatas: cada caja enlaza a una fila que existe; sin desplazamiento lateral a 390 px; axe en
       claro y en oscuro para la página; el mapa y los hechos completos sin JavaScript. Verificar que
       solo se añaden las que pasan la puerta y que las pruebas actuales de la página no se tocan.
