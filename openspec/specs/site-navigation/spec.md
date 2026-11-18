@@ -148,9 +148,10 @@ El grupo Reference SHALL enlazar Frameworks, Crosswalk, Harms atlas, Incidents, 
 Templates & schemas, Tools, Glossary y Reading list, cada uno con una descripción de una línea (≤ 90
 caracteres). La entrada Incidents SHALL enlazar `/cases` (la etiqueta cambia, el URL no) y la entrada
 Research SHALL ir justo después y enlazar `/research`. El grupo About SHALL enlazar Changelog,
-Contributors, Methodology y Contribute (`/contribute`), y los enlaces del proyecto del footer SHALL
-incluir Contribute. Las descripciones MUST NOT contener "Body of Knowledge". El modelo MUST NOT añadir
-grupos nuevos para estos destinos.
+Contributors, Methodology, Independence (`/about/independence`), Contribute (`/contribute`) y
+Privacy (`/privacy`), y los enlaces del proyecto del footer SHALL incluir Contribute. Privacy SHALL
+aparecer en el pie y MAY omitirse del menú de cabecera. Las descripciones MUST NOT contener "Body of
+Knowledge". El modelo MUST NOT añadir grupos nuevos para estos destinos.
 
 #### Scenario: Recursos nuevos en el menú
 - **WHEN** el usuario abre Reference
@@ -165,6 +166,11 @@ grupos nuevos para estos destinos.
 #### Scenario: Contribute en About
 - **WHEN** el usuario abre About
 - **THEN** encuentra un enlace a `/contribute` con su descripción de una línea
+
+#### Scenario: Independencia y privacidad en About
+- **WHEN** el usuario mira el grupo About del pie
+- **THEN** encuentra enlaces a `/about/independence` y a `/privacy`, cada uno con su descripción de
+  una línea
 
 ### Requirement: Destinos del proyecto abierto en Practice y For you
 El grupo Practice SHALL enlazar Controls (`/controls`) justo después de Patterns, y el grupo For you
