@@ -25,5 +25,5 @@
 
 ## 5. Entrega
 
-- [ ] 5.1 Abrir el PR con la tabla de celdas en el cuerpo para que Jordi lea y firme el contenido; verificar que la CI termina en verde y que Jordi da su visto bueno al contenido
-- [ ] 5.2 Tras el merge, comprobar en producción la página, el conjunto de la API y los enlaces desde `/role` y `/path`; verificar con respuestas 200 y 28 celdas
+- [x] 5.1 Abrir el PR con la tabla de celdas en el cuerpo para que Jordi lea y firme el contenido; verificar que la CI termina en verde y que Jordi da su visto bueno al contenido
+- [x] 5.2 Tras el merge, comprobar en producción la página, el conjunto de la API y los enlaces desde `/role` y `/path`; verificar con respuestas 200 y 28 celdas
