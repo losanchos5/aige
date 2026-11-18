@@ -12,7 +12,8 @@ etiquetas `primary`, `secondary` y `reported`, las fechas "as of", la cadencia d
 comprobaciones de la build, las correcciones y contribuciones (con enlaces a los formularios de
 issue) y el versionado con DOI. Cada afirmación MUST ser comprobable en el repositorio o citar una
 fuente numerada en el formato de la casa, y la página MUST NOT afirmar nada sobre financiación o
-patrocinio. La ruta SHALL figurar en `SOURCE_BY_PATH`, en el grupo About de la navegación y en
+patrocinio: esa declaración es del autor y vive en `/about/independence`, que la página SHALL
+enlazar. La ruta SHALL figurar en `SOURCE_BY_PATH`, en el grupo About de la navegación y en
 `/about`.
 
 #### Scenario: Enlaces de la página
@@ -22,7 +23,8 @@ patrocinio. La ruta SHALL figurar en `SOURCE_BY_PATH`, en el grupo About de la n
 
 #### Scenario: Sin afirmaciones de independencia inventadas
 - **WHEN** se lee la página
-- **THEN** no contiene ninguna declaración de financiación, patrocinio o independencia
+- **THEN** no hace ninguna declaración de financiación, patrocinio o independencia y enlaza
+  `/about/independence`, donde está la del autor
 
 ### Requirement: Roles de autoría y revisión
 `bok/CONTRIBUTORS.md` SHALL definir los roles de autor, revisor y colaborador, qué hace cada uno,

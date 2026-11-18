@@ -282,13 +282,16 @@ one streamable-http remote). Its `version` must follow the server version in `sr
 The registry verifies the domain through
 `https://aigovernanceengineer.com/.well-known/mcp-registry-auth`, which holds the public key. The
 private key stays outside the repository. To publish, from `tools/mcp-server`, with `key.pem` being
-that Ed25519 private key:
+that Ed25519 private key (mcp-publisher v1.8.9 takes it as a flag; it ignores the
+`MCP_PRIVATE_KEY` variable some docs mention):
 
 ```bash
-MCP_PRIVATE_KEY="$(openssl pkey -in key.pem -noout -text | sed -n '/priv:/,/pub:/p' | sed '1d;$d' | tr -d ' :\n')" \
-  mcp-publisher login http --domain aigovernanceengineer.com
+HEX="$(openssl pkey -in key.pem -noout -text | sed -n '/priv:/,/pub:/p' | sed '1d;$d' | tr -d ' :\n')"
+mcp-publisher login http --domain aigovernanceengineer.com --private-key "$HEX"
 mcp-publisher publish
 ```
+
+First published on 2026-11-18 as `com.aigovernanceengineer/reference` 0.6.1.
 
 ## Licence and attribution
 

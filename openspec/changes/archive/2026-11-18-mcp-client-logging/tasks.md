@@ -12,6 +12,6 @@
 ## 3. Revisión y entrega
 
 - [x] 3.1 Revisión de seguridad del diff (inyección en el registro, fuga de argumentos, lectura del cuerpo); verificar que no quedan hallazgos críticos ni altos abiertos
-- [ ] 3.2 Abrir el PR y esperar la CI; verificar que termina en verde
-- [ ] 3.3 Desplegar la imagen `aige-mcp:0.6.1` en el VPS según D8; verificar que `/healthz` responde, que un `initialize` etiquetado deja una línea con `client` y `tag`, y que una llamada a una herramienta deja su nombre y no su argumento
-- [ ] 3.4 Comprobar en producción la frase de privacidad de `/mcp`; verificar con una petición a la página
+- [x] 3.2 Abrir el PR y esperar la CI; verificar que termina en verde
+- [x] 3.3 Desplegar la imagen `aige-mcp:0.6.1` en el VPS según D8; verificar que `/healthz` responde, que un `initialize` etiquetado deja una línea con `client` y `tag`, y que una llamada a una herramienta deja su nombre y no su argumento
+- [x] 3.4 Comprobar en producción la frase de privacidad de `/mcp`; verificar con una petición a la página

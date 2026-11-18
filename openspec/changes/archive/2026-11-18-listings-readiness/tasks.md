@@ -25,5 +25,5 @@
 - [x] 5.1 Revisión con `code-reviewer`: cada afirmación de `/privacy` contra el código y la documentación citada; verificar que no quedan hallazgos críticos ni altos
 - [x] 5.2 Abrir el PR con la lista de frases que Jordi debe confirmar y esperar la CI; verificar que termina en verde
 - [x] 5.3 Jordi confirma los textos de privacidad e independencia; verificar con su visto bueno en el PR
-- [ ] 5.4 Tras el merge, comprobar en producción `/privacy`, `/about/independence` y `/.well-known/mcp-registry-auth` (`200`, `text/plain`, sin redirección)
-- [ ] 5.5 Con el visto bueno de Jordi, publicar en el registro de MCP (`mcp-publisher login http`, `publish`) y dejarle los textos del directorio de Claude en `D:/Documents/aige-media/outreach/2026-11-listings/`; verificar que la entrada aparece en `registry.modelcontextprotocol.io`
+- [x] 5.4 Tras el merge, comprobar en producción `/privacy`, `/about/independence` y `/.well-known/mcp-registry-auth` (`200`, `text/plain`, sin redirección)
+- [x] 5.5 Con el visto bueno de Jordi, publicar en el registro de MCP (`mcp-publisher login http`, `publish`) y dejarle los textos del directorio de Claude en `D:/Documents/aige-media/outreach/2026-11-listings/`; verificar que la entrada aparece en `registry.modelcontextprotocol.io`
