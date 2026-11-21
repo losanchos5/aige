@@ -1,0 +1,60 @@
+---
+/**
+ * CertificationVendors: the vendors' own engineering certifications, grouped by
+ * vendor. Each vendor names its own tiers; the page shows them word for word,
+ * with no common scale. A box is one link to its row in CertificationFacts:
+ * name without the vendor prefix, then exam code or acronym and the vendor's
+ * tier word. Styles: cert-map.css.
+ */
+import { certifications, retiredDate, statusWords } from '../data/certifications';
+
+const vendorCerts = certifications.filter((c) => c.lane === 'engineering');
+const vendors = [...new Set(vendorCerts.map((c) => c.issuer))].sort((a, b) =>
+  a.localeCompare(b, 'en', { sensitivity: 'base' }),
+);
+const vid = (v: string) => 'v-' + v.replace(/\W+/g, '-');
+---
+
+<h2 id="vendor-certifications">Vendor engineering certifications</h2>
+<p>
+  Cloud and AI vendors certify their own platforms. Each vendor names its own tiers, shown here word
+  for word; the tiers are not the same scale across vendors and the boxes are not ranked.
+</p>
+<div class="cm-wide">
+  <div class="cm-frame">
+    {
+      vendors.map((v) => (
+        <section class="cm-vendor" aria-labelledby={vid(v)}>
+          <h3 class="cm-vendor-h" id={vid(v)}>{v}</h3>
+          <ul class="cm-nodes">
+            {vendorCerts
+              .filter((c) => c.issuer === v)
+              .map((c) => {
+                const second = [c.acronym, c.issuerLevel].filter(Boolean).join(' · ');
+                return (
+                  <li>
+                    <a class={`cm-node cm-node--${c.type}`} href={`#cert-${c.id}`}>
+                      <span class="cm-name">{c.short}</span>
+                      {second && <span class="cm-lvl">{second}</span>}
+                      {c.status === 'retired' ? (
+                        <span class="cm-tag cm-tag--retired">RETIRED {retiredDate(c)}</span>
+                      ) : (
+                        c.status !== 'live' && (
+                          <span class="cm-tag">{statusWords[c.status].toUpperCase()}</span>
+                        )
+                      )}
+                      {(c.unverified.includes('status') || c.unverified.includes('name')) && (
+                        <span class="cm-tag cm-tag--unv">UNVERIFIED</span>
+                      )}
+                      {c.governanceDomain && <span class="cm-tag cm-tag--gov">governance domain</span>}
+                      <span class="visually-hidden">, {c.type}</span>
+                    </a>
+                  </li>
+                );
+              })}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+</div>

@@ -339,7 +339,17 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
       'src/lib/aigp-heatmap.ts',
     ],
   ],
-  ['/for/certifications', ['src/pages/for/certifications.astro', 'src/data/aigp.ts']],
+  [
+    '/for/certifications',
+    [
+      'src/pages/for/certifications.astro',
+      'src/data/aigp.ts',
+      'src/data/certifications.ts',
+      'src/components/CertificationMap.astro',
+      'src/components/CertificationVendors.astro',
+      'src/components/CertificationFacts.astro',
+    ],
+  ],
   // Block w2-tool-policy-card: the Policy Card builder, dated by its page, its
   // rule templates, the toolkit registry and its client modules.
   [

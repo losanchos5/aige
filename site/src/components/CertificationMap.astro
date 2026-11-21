@@ -1,0 +1,129 @@
+---
+/**
+ * CertificationMap: the core credentials by the subject in their title (one
+ * section per lane) and by what the issuer requires first (one list per
+ * non-empty band, aligned across lanes with subgrid). Position is the issuer's
+ * own fact: no ranking, no level of our own. Each box is one link to its row in
+ * CertificationFacts. The panel is opaque, on a painting with its credit; the
+ * whole map is plain HTML, readable without JavaScript. Styles: cert-map.css.
+ */
+import Painting from './Painting.astro';
+import { paintings } from '../data/paintings';
+import { site } from '../data/site';
+import {
+  bands,
+  certifications,
+  latestAsOf,
+  mapLanes,
+  retiredDate,
+  statusWords,
+} from '../data/certifications';
+
+const core = certifications.filter((c) => c.scope === 'core');
+const cell = (lane: string, band: string) => core.filter((c) => c.lane === lane && c.band === band);
+const paint = paintings['morning-seine-giverny'];
+const SIZES = '(min-width: 1200px) 1100px, calc(100vw - 32px)';
+const issueUrl = `${site.github}/issues/new?template=report-an-error.yml`;
+const dataUrl = `${site.github}/edit/main/site/src/data/certifications.ts`;
+---
+
+<h2 id="certification-map">The core map: subject by prerequisite</h2>
+<p>
+  Position shows the subject in the title and what the issuer requires before the exam. It says
+  nothing about difficulty, quality or value.
+</p>
+
+<p class="cm-legend-title">How to read a box</p>
+<ul class="cm-legend">
+  <li>
+    <span class="cm-node cm-node--certification cm-node--demo" aria-hidden="true"
+      ><span class="cm-ac">ABC</span><span class="cm-iss">Issuer</span></span
+    >Solid border: a certification
+  </li>
+  <li>
+    <span class="cm-node cm-node--certificate cm-node--demo" aria-hidden="true"
+      ><span class="cm-ac">ABC</span><span class="cm-iss">Issuer</span></span
+    >Dashed border: a certificate
+  </li>
+  <li>
+    <span class="cm-tag" aria-hidden="true">BETA</span>Tag: the credential is not live yet (BETA,
+    PILOT, ANNOUNCED, PRESALE)
+  </li>
+  <li>
+    <span class="cm-tag cm-tag--unv" aria-hidden="true">UNVERIFIED</span>UNVERIFIED: not yet
+    confirmed on the issuer's page
+  </li>
+  <li>
+    <span class="cm-req" aria-hidden="true"><span class="cm-req-k">requires</span> CISA +2</span
+    >requires: the prior credentials the issuer names
+  </li>
+</ul>
+
+<div class="cm-wide">
+  <div class="mat cm-mat">
+    <Painting id="morning-seine-giverny" sizes={SIZES} />
+    <div class="cm-panel">
+      <div class="cm-cols" role="group" aria-label="Core credentials by subject, with prerequisite strata">
+        {
+          mapLanes.map((lane, i) => (
+            <section class="cm-lane" aria-labelledby={`lane-${lane.id}`}>
+              <h3 class="cm-lane-h" id={`lane-${lane.id}`}>{lane.label}</h3>
+              {bands.map((band) => {
+                const items = cell(lane.id, band.id);
+                return items.length === 0 ? (
+                  <div class={`cm-grp cm-grp--empty cm-b-${band.id}`} aria-hidden="true" />
+                ) : (
+                  <div class={`cm-grp cm-b-${band.id}`}>
+                    <h4 class:list={['cm-band-h', { 'cm-band-h--quiet': i > 0 }]}>{band.label}</h4>
+                    <ul class="cm-nodes">
+                      {items.map((c) => (
+                        <li>
+                          <a class={`cm-node cm-node--${c.type}`} href={`#cert-${c.id}`}>
+                            {c.acronym ? (
+                              <span class="cm-ac">{c.acronym}</span>
+                            ) : (
+                              <span class="cm-name">{c.short}</span>
+                            )}
+                            <span class="cm-iss">{c.issuer}</span>
+                            {c.status === 'retired' ? (
+                              <span class="cm-tag cm-tag--retired">RETIRED {retiredDate(c)}</span>
+                            ) : (
+                              c.status !== 'live' && (
+                                <span class="cm-tag">{statusWords[c.status].toUpperCase()}</span>
+                              )
+                            )}
+                            {(c.unverified.includes('status') || c.unverified.includes('name')) && (
+                              <span class="cm-tag cm-tag--unv">UNVERIFIED</span>
+                            )}
+                            {c.band === 'credential' && c.requires.length > 0 && (
+                              <span class="cm-req">
+                                <span class="cm-req-k">requires</span>{' '}
+                                {c.requires.slice(0, 2).join(', ')}
+                                {c.requires.length > 2 && ` +${c.requires.length - 2}`}
+                              </span>
+                            )}
+                            <span class="visually-hidden">, {c.type}</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </section>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</div>
+<p class="credit">Mat: {paint.artist}, {paint.title}, {paint.year}</p>
+<p class="cm-legend-title">As of {latestAsOf()}</p>
+<p>
+  Spotted an error or a missing credential? <a href={issueUrl} rel="noopener">Open an issue</a> or
+  <a href={dataUrl} rel="noopener">edit the data file</a>.
+</p>
+<p>
+  This site is not affiliated with or endorsed by any issuer named here. Names and acronyms are
+  trademarks of their owners.
+</p>

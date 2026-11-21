@@ -95,6 +95,29 @@ log.
 The GitHub and Zenodo integration is not used for profiles: it mints a DOI for a snapshot of the whole
 repository on each GitHub release, not for one version of one profile.
 
+## Correcting or adding a credential (`/for/certifications`)
+
+The credential map, the vendor block and the facts tables read one file,
+`site/src/data/certifications.ts`. To correct a fact or add a credential, open an issue with the
+*Report an error on a page* form (`report-an-error.yml`) or a PR that edits that file. The build
+fails if an entry breaks a rule of `certificationProblems`.
+
+- **Fields.** `id` (unique, lower case), `issuer`, `name` (the issuer's official name), `acronym`
+  (or `null`), `short` (the box text when there is no acronym), `type` (`certification` or
+  `certificate`, by the word the issuer uses), `status`, `statusNote`, `lane` (the subject in the
+  title), `band` (what the issuer requires first), `requirementText` (140 characters at most),
+  `requires`, `issuerLevel`, `price`, `governanceDomain`, `url`, `asOf`, `unverified` and `scope`.
+- **Primary source, mandatory.** `url` is the issuer's own page, and every filled field was read on
+  it. Search snippets, forums, course resellers and news items are not sources. A page that blocks
+  automated readers does not excuse filling the field in from elsewhere: leave it empty and name it
+  in `unverified`.
+- **Date.** `asOf` is the day you read the page, as `YYYY-MM-DD`. Entries not read for twelve months
+  are marked on the page.
+- **Wording.** Status notes and level words are the issuer's, not ours. No ranking, no score, no
+  recommendation, no logo, no em dash.
+- **Not accepted.** Credentials of an organisation or a product (an ISO/IEC 42001 certificate of a
+  company, HITRUST, AIUC-1), and any credential with no fact readable on its issuer's page.
+
 ## Rules every PR must follow
 
 - **Cite every factual claim.** Each factual statement carries a `[n]` marker with a matching row in
