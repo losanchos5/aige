@@ -60,7 +60,7 @@
       "observedAt": "2026-09-26T11:28:20Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 49,
+      "failures": 50,
       "failingSince": "2026-10-06T13:21:23Z",
       "lastError": "HTTP 403"
     },
@@ -72,7 +72,7 @@
       "observedAt": "2026-09-26T11:28:19Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 49,
+      "failures": 50,
       "failingSince": "2026-10-06T13:21:23Z",
       "lastError": "HTTP 403"
     },
@@ -243,7 +243,7 @@
       "observedAt": "2026-09-26T11:27:35Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 2,
+      "failures": 3,
       "failingSince": "2026-11-22T14:37:18Z",
       "lastError": "The server returned a bot challenge or access-denied page instead of the content"
     },
@@ -255,7 +255,7 @@
       "observedAt": "2026-09-26T11:27:34Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 2,
+      "failures": 3,
       "failingSince": "2026-11-22T14:37:18Z",
       "lastError": "The server returned a bot challenge or access-denied page instead of the content"
     },
@@ -267,7 +267,7 @@
       "observedAt": "2026-09-26T11:27:36Z",
       "previousSha256": null,
       "changedAt": null,
-      "failures": 2,
+      "failures": 3,
       "failingSince": "2026-11-22T14:37:19Z",
       "lastError": "The server returned a bot challenge or access-denied page instead of the content"
     },
@@ -396,7 +396,7 @@
       "fingerprint": "e588314ac823c9b6",
       "kind": null,
       "sha256": null,
-      "failures": 59,
+      "failures": 60,
       "failingSince": "2026-09-26T11:28:22Z",
       "lastError": "HTTP 403"
     },
@@ -405,7 +405,7 @@
       "fingerprint": "10d744b170c204fe",
       "kind": null,
       "sha256": null,
-      "failures": 59,
+      "failures": 60,
       "failingSince": "2026-09-26T11:28:21Z",
       "lastError": "HTTP 403"
     },
@@ -428,10 +428,10 @@
       "url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
       "fingerprint": "f35216aa19af02af",
       "kind": "html",
-      "sha256": "9507748d0f94ffbe59797d617bc8938ce70d54529000ed745a036d287c5ea655",
-      "observedAt": "2026-11-23T18:14:21Z",
-      "previousSha256": "f844b44746068aa491c9e0e91c1e983380a62dc6aef07503b2e203458d97d2a1",
-      "changedAt": "2026-11-23T18:14:21Z",
+      "sha256": "c3e56145e40341cc7de92388cb1769a8ff92ec522d8d0f375cd8b9fa05555dd5",
+      "observedAt": "2026-11-24T17:49:13Z",
+      "previousSha256": "9507748d0f94ffbe59797d617bc8938ce70d54529000ed745a036d287c5ea655",
+      "changedAt": "2026-11-24T17:49:13Z",
       "failures": 0,
       "failingSince": null,
       "lastError": null
@@ -452,10 +452,10 @@
       "url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
       "fingerprint": "f35216aa19af02af",
       "kind": "html",
-      "sha256": "519444f115fdc3db61844c9793997d273a06e11fbed2db612e4016e68c730916",
-      "observedAt": "2026-11-23T18:14:18Z",
-      "previousSha256": "d226b85f12c5d0ee4986cd5050cb6690fe6b29a6de1a2b734b544b54e2a1a6ab",
-      "changedAt": "2026-11-23T18:14:18Z",
+      "sha256": "ac62595035e367c93e3ac873e4436584ee7140b3508af5afc72a68a36f3814e5",
+      "observedAt": "2026-11-24T17:49:11Z",
+      "previousSha256": "519444f115fdc3db61844c9793997d273a06e11fbed2db612e4016e68c730916",
+      "changedAt": "2026-11-24T17:49:11Z",
       "failures": 0,
       "failingSince": null,
       "lastError": null
