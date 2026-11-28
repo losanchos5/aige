@@ -2959,9 +2959,9 @@ export const obligations: readonly Obligation[] = [
     scope: 'Creditors',
     authority: 'National competent authorities',
     appliesFrom: '2026-11-20',
-    appliesStatus: 'applies-later',
+    appliesStatus: 'in-force',
     appliesNote: 'Member States apply their measures from 2026-11-20 (Art. 48)',
-    reviewed: REVIEWED_V050,
+    reviewed: '2026-11-28',
   },
 
   // ISO/IEC 42001 Annex A
