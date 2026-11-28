@@ -139,6 +139,7 @@ ya publican, y el requisito "Nivel de especificación declarado" ya cubre el cas
 |---|---|---|
 | 0 | Esquema, familias, clasificación de los 93, tablas, salidas, recuentos | 0 |
 | 1 | `gpai-and-frontier-models` | 16 a 20 |
+| 1b | `high-risk-provider` (gestión de riesgos del art. 9, documentación técnica, instrucciones de uso, vigilancia poscomercialización, comunicación con autoridades) | 18 a 24 |
 | 2 | `governance-programme` | 20 a 24 |
 | 3 | `transparency-rights-and-fairness` | 12 a 16 |
 | 4 | `ai-security` | 12 a 14 |
@@ -148,6 +149,23 @@ añaden datos y `PAGE_META`, y pueden ir en paralelo una vez fusionada la fase 0
 
 Cada control nuevo se escribe en dos pasos, con personas distintas en cada uno: un worker redacta
 desde la fuente leída y un revisor comprueba cada afirmación contra esa fuente antes del PR.
+
+### D8. Perfil `high-risk-provider` (añadido el 2026-11-28)
+
+El mapeo de las 193 medidas de los checklists de AESIA (v1.0, 2025-12-10) contra los 93 controles
+(`D:/Documents/aige-wt/handoffs/aesia-trial/aesia-mapping.md`; un lector, sin estadístico de
+acuerdo) dio 19 completas, 125 parciales y 49 sin control, y 72 controles candidatos de los que 31
+no encajan en ningún perfil previsto: son deberes del proveedor de un sistema de alto riesgo. El
+mapeo es una señal de dónde falta cobertura, no una fuente: cada control del perfil se deriva del
+Reglamento de IA (arts. 9 a 15, 16 a 21, 43, 47 a 49, 72, 73 y Anexo IV) leído en fuente oficial,
+y las guías de AESIA (CC BY 4.0) solo se citan como referencia adicional.
+
+Alternativa descartada: repartir esos controles entre `governance-programme` y los perfiles
+actuales. Mezclaría deberes de programa de cualquier organización con deberes legales de un actor
+concreto, y dejaría el perfil organizativo con más de 50 controles.
+
+El mapa AESIA como marco del crosswalk queda fuera de este cambio (cambio aparte, con su propia
+puerta de publicación).
 
 ## Risks / Trade-offs
 

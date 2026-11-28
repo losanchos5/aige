@@ -61,3 +61,10 @@ memoria (cada afirmación con URL leída y fecha), tests bajo la skill `test-aud
 
 - [ ] 8.1 Verificar que cada una de las 18 familias tiene al menos tres controles y que ningún id publicado antes del cambio ha desaparecido o cambiado de perfil
 - [ ] 8.2 Verificar en producción, tras la última fusión, `/controls/families`, `/api/v1/controls.json`, `/oscal/catalog.json` y el servidor MCP, y avisar a la sesión de herramientas de los ids y campos nuevos
+
+## 9. Fase 1b: perfil `high-risk-provider` (añadido el 2026-11-28; se entrega tras la fase 1)
+
+- [ ] 9.1 Leer en fuente oficial los arts. 9 a 21, 43, 47 a 49, 72 y 73 y el Anexo IV del Reglamento de IA, cruzar con los 31 candidatos sin perfil de `D:/Documents/aige-wt/handoffs/aesia-trial/aesia-mapping.md`, y entregar la ficha de candidatos (objetivo, fuente, URL, fecha, cita) sin duplicar controles de DATA, ASSURE ni DEPLOY
+- [ ] 9.2 Escribir el perfil y sus controles `derived` (prefijo `HRP`, `appliesTo` con `provider`) con origen de fuente primaria, evidencia, pregunta abierta, familia y mapeos, y verificar que `controlProblems()` no devuelve nada
+- [ ] 9.3 Añadir `PAGE_META`, `llms.txt` y el test del perfil, y verificar página, twin, API y OSCAL en el build
+- [ ] 9.4 Revisión independiente contra fuentes y `code-reviewer`; suite en verde y PR de la fase 1b abierto

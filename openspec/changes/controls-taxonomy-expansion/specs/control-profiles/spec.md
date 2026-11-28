@@ -28,13 +28,13 @@ marcos y normas. La página del control y su JSON SHALL mostrar esa fecha.
 - **THEN** el build falla y nombra el control
 
 ### Requirement: Perfiles nuevos de la ampliación
-El registro SHALL incorporar cuatro perfiles nuevos, cada uno con prefijo de id propio, versión
+El registro SHALL incorporar cinco perfiles nuevos, cada uno con prefijo de id propio, versión
 `0.1`, estado `draft` y revisión `open`: `gpai-and-frontier-models` (prefijo `GPAI`),
-`governance-programme` (prefijo `ORG`), `transparency-rights-and-fairness` (prefijo `RIGHTS`) y
-`ai-security` (prefijo `SEC`). Cada control nuevo MUST ser `derived`, tener al menos un origen, una
+`high-risk-provider` (prefijo `HRP`), `governance-programme` (prefijo `ORG`),
+`transparency-rights-and-fairness` (prefijo `RIGHTS`) y `ai-security` (prefijo `SEC`). Cada control nuevo MUST ser `derived`, tener al menos un origen, una
 evidencia, una pregunta abierta, familia primaria, `appliesTo`, y al menos un mapeo a un marco o
 norma. Cada afirmación de un control nuevo MUST poder trazarse a una fuente primaria leída, con URL
-y fecha. Tras los cuatro perfiles, cada una de las 18 familias SHALL tener al menos tres controles.
+y fecha. Tras los cinco perfiles, cada una de las 18 familias SHALL tener al menos tres controles.
 
 #### Scenario: Perfil nuevo publicado
 - **WHEN** se construye el sitio tras añadir un perfil nuevo
@@ -42,7 +42,7 @@ y fecha. Tras los cuatro perfiles, cada una de las 18 familias SHALL tener al me
   sus controles en la API y en OSCAL, y `controlProblems()` no devuelve nada
 
 #### Scenario: Cobertura mínima por familia
-- **WHEN** se han fusionado los cuatro perfiles nuevos
+- **WHEN** se han fusionado los cinco perfiles nuevos
 - **THEN** ninguna familia tiene menos de tres controles
 
 #### Scenario: Ids anteriores intactos

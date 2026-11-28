@@ -26,12 +26,16 @@ completas y una salida legible por máquina coherente.
   Anexo A (de 14 a 38 ids), las 40 medidas del Código de buenas prácticas GPAI y los ids de CSA
   AICM v1.1. Una fila sin verificar en fuente primaria se publica marcada como no verificada.
 - Cada control declara la fecha en que se revisaron sus mapeos.
-- Cuatro perfiles nuevos, con controles `derived` de fuente primaria verificada:
+- Cinco perfiles nuevos, con controles `derived` de fuente primaria verificada:
   1. `gpai-and-frontier-models` (familia 18 y afines).
   2. `governance-programme` (gobierno, inventario, riesgo e impacto, terceros, alfabetización).
   3. `transparency-rights-and-fairness`.
   4. `ai-security`.
-  Orden de magnitud: de 93 a unos 160 controles.
+  5. `high-risk-provider` (deberes del proveedor de un sistema de alto riesgo: gestión de riesgos,
+     documentación técnica, instrucciones de uso, vigilancia poscomercialización). Añadido el
+     2026-11-28: un mapeo de las 193 medidas de los checklists de AESIA dejó 31 controles candidatos
+     sin perfil donde encajar. Se entrega después de la fase 1.
+  Orden de magnitud: de 93 a unos 180 controles.
 - `family` y `appliesTo` en la API, el servidor MCP y OSCAL (como `prop`; los grupos del catálogo
   OSCAL siguen siendo los perfiles). Dataset nuevo de familias en la API.
 - Los recuentos que la web muestra (controles, perfiles, familias) salen de los datos en el build.
@@ -50,7 +54,7 @@ este único cambio.
 ### Modified Capabilities
 
 - `control-profiles`: origen de fuente primaria para controles `derived`, fecha de revisión de
-  mapeos, cuatro perfiles nuevos y recuentos derivados de los datos.
+  mapeos, cinco perfiles nuevos y recuentos derivados de los datos.
 - `controls-crosswalk`: tablas de referencia completas con fuente y fecha por fila, y columnas del
   Código GPAI y de CSA AICM.
 - `open-data-api`: campos `family`, `secondaryFamilies` y `appliesTo` en los controles y dataset de
@@ -60,7 +64,7 @@ este único cambio.
 
 ## Impact
 
-- Datos: `site/src/data/controls/` (tipos, validador, fichero de familias, cuatro perfiles nuevos),
+- Datos: `site/src/data/controls/` (tipos, validador, fichero de familias, cinco perfiles nuevos),
   `site/src/data/threats.ts` (Anexo A), tablas nuevas del Código GPAI y de AICM,
   `site/src/data/crosswalk.ts`.
 - Páginas: `/controls`, `/controls/families`, páginas de perfil y de control, `/controls/crosswalk`,
