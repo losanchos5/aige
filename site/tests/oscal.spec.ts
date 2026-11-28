@@ -30,3 +30,22 @@ test('the OSCAL catalog and profiles carry exactly the controls of /api/v1/contr
     );
   }
 });
+
+test('each OSCAL control carries the family, secondary families and actors of its API record', () => {
+  const api = readJson('api', 'v1', 'controls.json');
+  const byId = new Map<string, Json>(api.controls.map((c: Json) => [c.id, c]));
+  const catalog = readJson('oscal', 'catalog.json').catalog;
+  const values = (control: Json, name: string): string[] =>
+    (control.props ?? []).filter((p: Json) => p.name === name).map((p: Json) => p.value);
+  const controls = catalog.groups.flatMap((g: Json) => g.controls);
+  expect(controls.length).toBeGreaterThan(0);
+  for (const control of controls) {
+    const record = byId.get(control.id)!;
+    expect(values(control, 'family'), control.id).toEqual([record.family]);
+    expect(values(control, 'secondary-family'), control.id).toEqual(record.secondaryFamilies);
+    expect(values(control, 'applies-to'), control.id).toEqual(record.appliesTo);
+  }
+  // The values are ids of the published family list, not free text.
+  const familyIds = new Set<string>(api.families.map((f: Json) => f.id));
+  for (const control of controls) expect(familyIds.has(values(control, 'family')[0]), control.id).toBe(true);
+});

@@ -17,8 +17,8 @@
 //   5. MITRE ATLAS techniques (the threat bridge rows, plus any "other"
 //      mapping named exactly "MITRE ATLAS");  6. CSA AICM;
 //   7. NIST SP 800-53 (from `other`), one row per control family (AC, AU...)
-//      listing the specific controls cited;  8. AIUC-1;
-//   9. every remaining `other` framework, by name.
+//      listing the specific controls cited;  8. AIUC-1;  9. the GPAI Code of Practice;
+//  10. every remaining `other` framework, by name.
 //
 // Rows sort naturally (A.6.2.4 before A.10.3), NIST AI RMF rows in the order of
 // NIST AI 100-1. Paths of this site's own pages (obligation rows) stay
@@ -36,9 +36,11 @@ import {
   type Control,
 } from '../data/controls';
 import { frameworks, obligationById, obligationPath } from '../data/frameworks';
-import { iso42001Controls, taxonomies, threatById, aicmDomains, type ThreatTaxonomyId } from '../data/threats';
+import { iso42001Controls, iso42001Verified, ISO42001_SOURCE, taxonomies, threatById, aicmDomains, type ThreatTaxonomyId } from '../data/threats';
 import { nistAiRmfSubcategoryById, nistAiRmfSubcategoryIndex, NIST_AI_RMF_SOURCE } from '../data/nist-ai-rmf';
 import { aiuc1ById, AIUC1_INDEX } from '../data/aiuc1';
+import { aicmV11ControlById } from '../data/csa-aicm';
+import { gpaiMeasureById, GPAI_CODE_PAGE } from '../data/gpai-code';
 import { site } from '../data/site';
 
 /** Site path of the crosswalk page. */
@@ -59,10 +61,13 @@ export const CROSSWALK_DISCLAIMER =
 export const AIUC1_NOTE =
   'This site is not affiliated with AIUC and holds no AIUC certificate; ids read on AIUC-1\'s public pages. Each mapping is this project\'s reading of the requirement text, not AIUC\'s.';
 
+/** What a row says when it carries no verified date (ISO/IEC 42001 is paywalled: today every row). */
+export const NOT_VERIFIED_NOTE = 'Not verified against the primary source.';
+
 // The source pages the framework headings link to. ISO/IEC 42001 is the page
 // /controls already links; SP 800-53 is the Rev. 5 publication page the
 // evaluation environment profile cites.
-const ISO_42001_URL = 'https://www.iso.org/standard/81230.html';
+const ISO_42001_URL = ISO42001_SOURCE;
 const SP_800_53_URL = 'https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final';
 const SP_800_53 = /^NIST SP 800-53\b/;
 const ATLAS = 'MITRE ATLAS';
@@ -76,6 +81,10 @@ export interface CrosswalkRow {
   url: string | null;
   /** A note on this row, or null. */
   note: string | null;
+  /** YYYY-MM-DD the row was read in the primary source, or null. */
+  verified: string | null;
+  /** True when the framework tracks verification and this row has no date. */
+  unverified: boolean;
   /** Ids of the controls that map to it, in registry order. */
   controls: string[];
 }
@@ -101,6 +110,8 @@ interface Entry {
   name: string;
   url: string | null;
   note: string | null;
+  verified?: string | null;
+  unverified?: boolean;
   /** The id exactly as the control maps it (AC-3 inside the AC row). */
   detail: string;
   control: string;
@@ -148,7 +159,18 @@ function collectEntries(rows: readonly Control[]): Entry[] {
       });
     }
     for (const id of m.iso42001) {
-      push({ framework: 'iso42001', ref: id, name: iso42001Controls[id] ?? id, url: null, note: null, detail: id, control: c.id });
+      const verified = iso42001Verified[id] ?? null;
+      push({
+        framework: 'iso42001',
+        ref: id,
+        name: iso42001Controls[id] ?? id,
+        url: ISO42001_SOURCE,
+        note: verified ? null : NOT_VERIFIED_NOTE,
+        verified,
+        unverified: verified === null,
+        detail: id,
+        control: c.id,
+      });
     }
     for (const id of m.nistAiRmf) {
       push({
@@ -168,12 +190,15 @@ function collectEntries(rows: readonly Control[]): Entry[] {
     }
     for (const id of m.csaAicm ?? []) {
       const domain = (aicmDomains as Readonly<Record<string, string>>)[id.split('-')[0]];
+      const row = aicmV11ControlById(id);
       push({
         framework: 'csa-aicm',
         ref: id,
         name: domain ? `${domain} domain` : id,
-        url: null,
-        note: null,
+        url: row?.url ?? null,
+        note: row?.verified ? null : NOT_VERIFIED_NOTE,
+        verified: row?.verified ?? null,
+        unverified: !row?.verified,
         detail: id,
         control: c.id,
       });
@@ -186,6 +211,22 @@ function collectEntries(rows: readonly Control[]): Entry[] {
         name: r?.title ?? id,
         url: r?.url ?? null,
         note: r?.verified ? `Read on its public AIUC-1 page on ${r.verified}; not affiliated with AIUC.` : 'Not affiliated with AIUC.',
+        verified: r?.verified ?? null,
+        unverified: !r?.verified,
+        detail: id,
+        control: c.id,
+      });
+    }
+    for (const id of m.gpaiCode ?? []) {
+      const r = gpaiMeasureById(id);
+      push({
+        framework: 'gpai-code',
+        ref: id,
+        name: r?.title ?? id,
+        url: r?.url ?? null,
+        note: r?.verified ? null : NOT_VERIFIED_NOTE,
+        verified: r?.verified ?? null,
+        unverified: !r?.verified,
         detail: id,
         control: c.id,
       });
@@ -250,6 +291,12 @@ function frameworkMetas(entries: readonly Entry[]): FrameworkMeta[] {
     note: 'One row per control family; each row names the specific controls cited from it.',
   });
   metas.push({ id: 'aiuc1', name: 'AIUC-1', url: new URL(AIUC1_INDEX.url).origin, note: AIUC1_NOTE });
+  metas.push({
+    id: 'gpai-code',
+    name: 'EU General-Purpose AI Code of Practice',
+    url: GPAI_CODE_PAGE,
+    note: "The 40 measures of the Code (T transparency, C copyright, S safety and security), by this site's own short titles; each row links to the chapter it was read in. The Code is voluntary.",
+  });
   const others = new Map<string, string>();
   for (const e of entries) {
     if (e.framework.startsWith('other-') && e.source) others.set(e.framework, e.source);
@@ -267,13 +314,17 @@ function rowsOf(meta: FrameworkMeta, entries: readonly Entry[], order: ReadonlyM
     if (e.framework !== meta.id) continue;
     let slot = byRef.get(e.ref);
     if (!slot) {
-      slot = { row: { ref: e.ref, name: e.name, url: e.url, note: e.note, controls: [] }, details: new Map() };
+      slot = {
+        row: { ref: e.ref, name: e.name, url: e.url, note: e.note, verified: e.verified ?? null, unverified: e.unverified ?? false, controls: [] },
+        details: new Map(),
+      };
       byRef.set(e.ref, slot);
     }
     // An "other" mapping that lands on a row of a built-in framework (an ATLAS
     // id also mapped through `atlas`) carries no url: keep the catalogue's.
     if (slot.row.url === null && e.url !== null) slot.row = { ...slot.row, name: e.name, url: e.url };
     if (slot.row.note === null && e.note !== null) slot.row = { ...slot.row, note: e.note };
+    if (slot.row.verified === null && e.verified) slot.row = { ...slot.row, verified: e.verified, unverified: false };
     if (!slot.row.controls.includes(e.control)) slot.row.controls.push(e.control);
     if (!slot.details.has(e.detail)) slot.details.set(e.detail, e.name);
   }

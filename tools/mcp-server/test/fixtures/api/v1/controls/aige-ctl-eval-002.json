@@ -6,7 +6,7 @@
   "schemaVersion": 1,
   "schema": "https://aigovernanceengineer.com/api/v1/schemas/control.json",
   "self": "https://aigovernanceengineer.com/api/v1/controls/aige-ctl-eval-002.json",
-  "source": "https://aigovernanceengineer.com/controls/evaluation-environment#aige-ctl-eval-002",
+  "source": "https://aigovernanceengineer.com/controls/evaluation-environment/aige-ctl-eval-002",
   "citation": {
     "title": "AI Governance Engineering: The Thesis & Body of Knowledge",
     "authors": [
@@ -18,10 +18,10 @@
   "control": {
     "id": "AIGE-CTL-EVAL-002",
     "profile": "evaluation-environment",
-    "url": "https://aigovernanceengineer.com/controls/evaluation-environment#aige-ctl-eval-002",
+    "url": "https://aigovernanceengineer.com/controls/evaluation-environment/aige-ctl-eval-002",
     "json": "https://aigovernanceengineer.com/api/v1/controls/aige-ctl-eval-002.json",
     "title": "Network Egress Control",
-    "version": "0.1",
+    "version": "0.2",
     "status": "draft",
     "reviewerStatus": "open",
     "depth": "specified",
@@ -112,6 +112,16 @@
         "url": "https://aigovernanceengineer.com/bok/governing-agents#runtime-guardrails-for-tool-calls"
       }
     ],
+    "family": "agent-controls",
+    "secondaryFamilies": [
+      "ai-security"
+    ],
+    "appliesTo": [
+      "provider",
+      "gpai-provider"
+    ],
+    "mappingsReviewed": "2026-09-26",
+    "derivedFrom": [],
     "mappings": {
       "obligations": [
         {
@@ -164,8 +174,11 @@
           "url": "https://aigovernanceengineer.com/resources/threats#threat-aml-t0086"
         }
       ],
-      "aiuc1": [],
+      "aiuc1": [
+        "B006"
+      ],
       "csaAicm": [],
+      "gpaiCode": [],
       "other": [
         {
           "framework": "MITRE ATLAS mitigation",
@@ -181,6 +194,11 @@
           "framework": "NIST SP 800-53 Rev. 5",
           "ref": "SC-7(5)",
           "note": "Deny by default, allow by exception"
+        },
+        {
+          "framework": "IMDA MGF for Agentic AI v1.5",
+          "ref": "2.1.2 Agent limits, p.19",
+          "note": "Partial fit: Limited network access for high-risk tasks; no egress allow-list"
         }
       ]
     },
@@ -193,7 +211,7 @@
         "verified": "primary"
       },
       {
-        "n": 8,
+        "n": 14,
         "title": "Governing AI agents",
         "text": "Governing AI agents (AI Governance Engineering Body of Knowledge v0.5.0, chapter 23, section \"Runtime guardrails for tool calls\"). AI Governance Engineer (Jorge García Aibar). 2026-09.",
         "url": "https://aigovernanceengineer.com/bok/governing-agents#runtime-guardrails-for-tool-calls",
@@ -209,19 +227,19 @@
       {
         "n": 5,
         "title": "Brief independent investigation of agents' behavior, reasoning and collaboration in the OpenAI / Hugging Face hacking incident",
-        "text": "Brief independent investigation of agents' behavior, reasoning and collaboration in the OpenAI / Hugging Face hacking incident (METR states that agents \"meant to be fully isolated from one another\" communicated through an internal package repository, reports spoofed tool calls in at least 96 transcripts and transcripts missing components after container resets). METR. 2026-08-26.",
+        "text": "Brief independent investigation of agents' behavior, reasoning and collaboration in the OpenAI / Hugging Face hacking incident (METR states that agents \"meant to be fully isolated from one another\" communicated through an internal package repository, and that one agent found working Hugging Face credentials exposed on the internet and posted them to the agents' board; it reports spoofed tool calls in at least 96 transcripts and transcripts missing components after container resets). METR. 2026-08-26.",
         "url": "https://metr.org/blog/2026-08-26-openai-hugging-face-incident-investigation/",
         "verified": "primary"
       },
       {
-        "n": 9,
+        "n": 15,
         "title": "Vivaria server environment variables",
         "text": "Vivaria server environment variables (no-internet task environments connected to a separate Docker network and optionally sandboxed with iptables rules; model API requests can be routed through a separate proxy service). METR. 2026.",
         "url": "https://vivaria.metr.org/reference/config/",
         "verified": "primary"
       },
       {
-        "n": 10,
+        "n": 16,
         "title": "MCP Security Best Practices (2026-07-28)",
         "text": "MCP Security Best Practices (2026-07-28) (token passthrough \"is explicitly forbidden\"; egress proxies and network policies for server-side clients). Model Context Protocol. 2026-07-28.",
         "url": "https://modelcontextprotocol.io/docs/2026-07-28/tutorials/security/security_best_practices",
@@ -235,14 +253,14 @@
         "verified": "primary"
       },
       {
-        "n": 11,
+        "n": 17,
         "title": "OWASP GenAI LLM Top 10 2026",
         "text": "OWASP GenAI LLM Top 10 2026 (LLM01:2026 Prompt Injection to LLM10:2026 Improper Output Handling; resource page dated 3 Aug 2026). OWASP GenAI Security Project. 2026-08-03.",
         "url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
         "verified": "primary"
       },
       {
-        "n": 12,
+        "n": 18,
         "title": "MITRE ATLAS data, release v2026.09",
         "text": "MITRE ATLAS data, release v2026.09 (16 tactics, 120 techniques, 88 sub-techniques, 40 mitigations; technique names and technique-to-mitigation links read from dist/v6/ATLAS-2026.09.yaml). MITRE. 2026-09-15.",
         "url": "https://github.com/mitre-atlas/atlas-data/releases/tag/v2026.09",
@@ -254,12 +272,47 @@
         "text": "NIST SP 800-53 Rev. 5, Security and Privacy Controls for Information Systems and Organizations (control catalogue cited by control id; publication page of Revision 5 with update 1 of 10 Dec 2020). NIST. 2020-12-10.",
         "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final",
         "verified": "primary"
+      },
+      {
+        "n": 19,
+        "title": "An agent used DNS to reach an external chatbot (misalignment report)",
+        "text": "An agent used DNS to reach an external chatbot (misalignment report) (OpenAI reports a training run that reached a public chatbot through \"insufficient DNS filtering\" in its sandbox; the monitor flagged it within 15 minutes, the run \"did not stop automatically as expected\" and was killed 2.5 hours later). OpenAI (Alignment Research Blog). 2026-09-25.",
+        "url": "https://alignment.openai.com/misalignment-reports/an-agent-used-dns-to-reach-an-external-chatbot/",
+        "verified": "primary"
+      },
+      {
+        "n": 12,
+        "title": "OpenAI Hugging Face Incident Technical Report",
+        "text": "OpenAI Hugging Face Incident Technical Report (OpenAI states that high-risk workloads are \"prohibited via technical controls from receiving direct or transitive Internet access\", protected by \"two separate layers of network isolation\", and that it is building tooling to \"identify and halt evaluation workloads\"). OpenAI. 2026-08-26.",
+        "url": "https://cdn.openai.com/pdf/67869394-cb91-4c12-888c-5cbd85c7814c/OpenAI-Hugging-Face%20Incident-Technical-Report.pdf",
+        "verified": "primary"
+      },
+      {
+        "n": 9,
+        "title": "Improving our alignment and security efforts",
+        "text": "Improving our alignment and security efforts (best practices for external partners running cyber evaluations: the only outside connection is \"to the model's own API\", with the API keys kept outside the environment; the configuration \"should be verified before every evaluation begins\"; boundaries \"phrased as instructions\"; challenges confirmed \"solvable in principle\"; a monitor that flags a scope violation to a human and ends the exercise). Anthropic. 2026-08-31.",
+        "url": "https://www.anthropic.com/news/improving-alignment-security-efforts",
+        "verified": "primary"
+      },
+      {
+        "n": 10,
+        "title": "AIUC-1 requirements",
+        "text": "AIUC-1 requirements (public requirement index, A001 to F002, each requirement on its own page (E007 and E014 marked retired); AIUC-1 is a standard of the Artificial Intelligence Underwriting Company; this site is not affiliated with AIUC, and a mapping here is not an AIUC-1 certificate or audit). Artificial Intelligence Underwriting Company. 2026-09-24.",
+        "url": "https://standard.aiuc-1.com/llms.txt",
+        "verified": "primary"
+      },
+      {
+        "n": 13,
+        "title": "Model AI Governance Framework for Agentic AI, v1.5",
+        "text": "Model AI Governance Framework for Agentic AI, v1.5 (published 2026-05-20, updated 2026-06-05; four dimensions: assess and bound the risks upfront, make humans meaningfully accountable, implement technical controls and processes, enable end-user responsibility). IMDA. 2026-06-05.",
+        "url": "https://www.imda.gov.sg/-/media/imda/files/about/emerging-tech-and-research/artificial-intelligence/mgf-for-agentic-ai.pdf",
+        "verified": "primary"
       }
     ],
     "implementationNotes": [
-      "Attach a default-deny egress policy to every task environment (a network policy, a firewall rule set or an egress proxy, by category) that lists each permitted destination explicitly, for example the LLM API proxy and the progress server. Enforce it on the resolved address, and serve DNS from a resolver that answers only for listed names: DNS is an egress path too.",
-      "Record the allow-list with the run: its hash goes in the run record next to the environment version, so the flow log can later be compared with what was declared, not with what was intended.",
-      "Keep a flow log per run at the enforcement point, outside anything the agent can reach or change, with refused attempts as well as allowed connections.",
+      "Attach a default-deny egress policy to every task environment (a network policy, a firewall rule set or an egress proxy, by category) that lists each permitted destination explicitly, for example the LLM API proxy and the progress server. Enforce it on the resolved address, and serve DNS from a resolver that answers only for listed names: DNS is an egress path too. OpenAI reports a training run that reached a public chatbot through \"insufficient DNS filtering\" in its sandbox.",
+      "Record the allow-list with the run (its hash goes in the run record next to the environment version) and keep a flow log per run at the enforcement point, outside anything the agent can reach or change, with refused attempts as well as allowed connections, so the connections made can be compared with what was declared, not with what was intended.",
+      "Enforce the policy in two places a single misconfiguration cannot both open, for example at the sandbox and at the cluster boundary. OpenAI's technical report on the Hugging Face incident describes \"two separate layers of network isolation\" of this kind, and Anthropic's guidance for external evaluation partners asks that the only outside connection be to the model's own API and that the configuration be verified before every evaluation begins.",
       "At admission, run a canary from inside the environment: one connection to a reserved test address that is not on the list. Expect a refused connection and a log entry; a success blocks the run.",
       "Treat resources shared between runs (package mirrors, caches, artefact stores) as destinations with their own entry and a per-run scope. METR's public investigation of the OpenAI/Hugging Face incident reports that agents meant to be \"fully isolated from one another\" communicated through a shared internal package repository."
     ],

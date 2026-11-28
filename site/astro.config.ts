@@ -507,6 +507,14 @@ const SOURCE_BY_PATH = new Map<string, readonly string[]>([
       'src/data/nist-ai-rmf.ts',
     ],
   ],
+  [
+    '/controls/families',
+    [
+      'src/pages/controls/families.astro',
+      'src/data/controls/families.ts',
+      ...controlProfiles.map((profile) => `src/data/controls/${profile.slug}.ts`),
+    ],
+  ],
   ['/frontier', ['src/pages/frontier.astro', 'src/data/frontier.ts']],
   ['/research', ['src/pages/research/index.astro', 'src/data/research.ts']],
   ...writtenThemes().map(
@@ -534,6 +542,7 @@ const REVIEWED_BY_PATH = new Map<string, string>(
 const CONTROLS_DATE_BY_PATH = new Map<string, string>([
   ['/controls', controlsUpdated()],
   ['/controls/crosswalk', controlsUpdated()],
+  ['/controls/families', controlsUpdated()],
   ...controlProfiles.map((profile) => [profilePath(profile), profile.updated] as [string, string]),
   ...controlPages.map(
     ({ path, profile }) => [path, profileBySlug(profile)?.updated ?? controlsUpdated()] as [string, string],

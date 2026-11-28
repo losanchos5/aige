@@ -119,6 +119,7 @@ import {
   observationExamples,
   CONTROLS_AS_OF,
   type Control,
+  type ClassifiedControl,
   type ControlProfile,
   type ControlSource,
 } from '../data/controls';
@@ -129,6 +130,7 @@ import { getGlossary, termId } from './glossary';
 import { sourceText } from './sources';
 import { obligationApiPath } from './obligations';
 import { buildControlsCrosswalk, type ControlsCrosswalk } from './controls-crosswalk';
+import { families as controlFamilies, ACTORS } from '../data/controls/families';
 
 // ---------------------------------------------------------------------------
 // URLs
@@ -346,7 +348,7 @@ const POLICY_EFFECTS = ['deny', 'allow', 'require_approval', 'alert'] as const;
 const VERIFICATION_KINDS = ['inspect', 'test', 'observe', 'attest'] as const;
 const SUBJECT_KINDS = ['eval-environment', 'eval-run', 'agent', 'tool-server', 'harness', 'model-artefact'] as const;
 const VERIFICATION_TAGS = ['primary', 'secondary', 'reported'] as const;
-const DERIVED_FROM_KINDS = ['pattern', 'schema', 'chapter'] as const;
+const DERIVED_FROM_KINDS = ['pattern', 'schema', 'chapter', 'source'] as const;
 const PROFILE_DOI_KINDS = ['profile', 'profile-concept', 'project-concept'] as const;
 
 const personName = (id: string) => personById(id)?.name ?? id;
@@ -363,6 +365,8 @@ function threatRef(id: string) {
 
 /** Site path of the material a derived control restates. */
 function derivedFromPath(src: ControlSource): string {
+  // kind 'source': ref is already the url of one of the control's references.
+  if (src.kind === 'source') return src.ref;
   if (src.kind === 'pattern') {
     const p = getPatternBySlug(src.ref);
     return p ? patternPath(p) : `/patterns/${src.ref}`;
@@ -375,7 +379,7 @@ function derivedFromPath(src: ControlSource): string {
 }
 
 /** One control as the API publishes it. */
-export function controlRecord(row: Control) {
+export function controlRecord(row: ClassifiedControl) {
   const sources = profileSources(row.profile);
   const m = row.mappings;
   return {
@@ -414,6 +418,12 @@ export function controlRecord(row: Control) {
         url: abs(seed ? `${agentChapter}#${agentAnchors[seed.anchor]}` : agentChapter),
       };
     }),
+    // Primary family (an id of `families` in the controls dataset), up to two secondary ones, the actors it applies to and the
+    // date its mappings were last reviewed.
+    family: row.family,
+    secondaryFamilies: [...(row.secondaryFamilies ?? [])],
+    appliesTo: [...row.appliesTo],
+    mappingsReviewed: row.mappingsReviewed,
     // Site material a derived control restates: a pattern page, a record schema
     // row of the templates library or a chapter page (always present, [] when none).
     derivedFrom: (row.derivedFrom ?? []).map((src) => ({
@@ -433,6 +443,7 @@ export function controlRecord(row: Control) {
       atlas: (m.atlas ?? []).map(threatRef),
       aiuc1: [...(m.aiuc1 ?? [])],
       csaAicm: [...(m.csaAicm ?? [])],
+      gpaiCode: [...(m.gpaiCode ?? [])],
       other: (m.other ?? []).map((o) => ({ framework: o.framework, ref: o.ref, note: o.note ?? null })),
     },
     references: row.references.map((src) => ({
@@ -514,11 +525,15 @@ export const controlSchema = s.obj(
       s.obj({ id: s.str('Agent control id.'), title: s.str('Agent control title.'), url: s.uri('Chapter 23 section.') }),
       'Chapter-23 agent controls the control builds on.',
     ),
+    family: s.str('Id of the primary family, one of `families` in the controls dataset.'),
+    secondaryFamilies: s.arr(s.str('Family id.'), 'Up to two further families, never the primary; empty when none.'),
+    appliesTo: s.arr(s.enumOf(ACTORS, 'Actor.'), 'The actors the control applies to: provider, deployer, gpai-provider.'),
+    mappingsReviewed: s.date("Date the control's mappings to frameworks and laws were last reviewed."),
     derivedFrom: s.arr(
       s.obj({
-        kind: s.enumOf(DERIVED_FROM_KINDS, 'What the source is: a pattern, a record schema or a chapter.'),
-        ref: s.str('Pattern slug, record schema id or chapter slug.'),
-        url: s.uri('Pattern page, the schema row of the templates library or chapter page.'),
+        kind: s.enumOf(DERIVED_FROM_KINDS, 'What the source is: a pattern, a record schema, a chapter or a primary source.'),
+        ref: s.str('Pattern slug, record schema id, chapter slug or, for a primary source, its url.'),
+        url: s.uri('Pattern page, the schema row of the templates library, chapter page or the primary source.'),
       }),
       'Site material a derived control restates; empty when none.',
     ),
@@ -534,6 +549,7 @@ export const controlSchema = s.obj(
         atlas: s.arr(threatRefSchema, 'MITRE ATLAS technique rows.'),
         aiuc1: s.arr(s.str('AIUC-1 requirement id.'), 'AIUC-1 requirements, only where read on the public requirement page; empty until then.'),
         csaAicm: s.arr(s.str('CSA AICM control id.'), 'CSA AICM controls, only when verified.'),
+        gpaiCode: s.arr(s.str('GPAI Code of Practice measure id (T1.1, C1.3, S3.2).'), 'GPAI Code of Practice measures, only when verified.'),
         other: s.arr(
           s.obj({
             framework: s.str('Framework or specification.'),
@@ -641,6 +657,40 @@ const controlProfileSchema = s.obj({
   ),
 });
 
+// The control families with their primary-source anchors and the number of controls in each.
+function familiesRecord() {
+  return controlFamilies.map((f) => ({
+    id: f.id,
+    order: f.order,
+    title: f.title,
+    definition: f.definition,
+    anchors: f.anchors.map((a) => ({ framework: a.framework, ref: a.ref, url: a.url, read: a.read })),
+    controlCount: controls.filter((c) => c.family === f.id).length,
+    secondaryControlCount: controls.filter((c) => (c.secondaryFamilies ?? []).includes(f.id)).length,
+  }));
+}
+
+const familiesSchema = s.arr(
+  s.obj({
+    id: s.str('Stable family id, the value of `family` in a control.'),
+    order: s.int('Position of the family, from 1.', 1),
+    title: s.str('Title.'),
+    definition: s.str('The outcome the family secures.'),
+    anchors: s.arr(
+      s.obj({
+        framework: s.str('Framework or law as named in its own text.'),
+        ref: s.str('Article, clause, domain or element.'),
+        url: s.uri('Page or file the reference was read in.'),
+        read: s.date('Date the reference was read.'),
+      }),
+      'Primary sources that treat the area as its own.',
+    ),
+    controlCount: s.int('Controls whose primary family it is.', 0),
+    secondaryControlCount: s.int('Controls that list it as a secondary family.', 0),
+  }),
+  'The control families, in order.',
+);
+
 // Block orp2-crosswalk: the controls read from the framework side
 // (lib/controls-crosswalk.ts), published as the `crosswalk` key of the
 // controls dataset. Site paths (obligation pages) become absolute URLs.
@@ -657,6 +707,8 @@ function crosswalkRecord(crosswalk: ControlsCrosswalk) {
         name: r.name,
         url: r.url === null ? null : abs(r.url),
         note: r.note,
+        verified: r.verified,
+        unverified: r.unverified,
         controls: [...r.controls],
       })),
     })),
@@ -677,6 +729,8 @@ const crosswalkSchema = s.obj(
             name: s.str('Its name or text.'),
             url: s.uriOrNull('Public page of the clause or id, when there is one.'),
             note: s.strOrNull('Note on the row.'),
+            verified: s.dateOrNull('Date the row was read in the primary source; null when it has not been.'),
+            unverified: s.bool('True when the framework tracks verification and the row has no date: "not verified against the primary source".'),
             controls: s.arr(s.str('Control id (AIGE-CTL-...).'), 'The controls that map to it, in registry order.'),
           }),
           'One row per clause or id some control maps to, sorted naturally.',
@@ -1820,12 +1874,14 @@ export const datasets: readonly Dataset[] = [
     build: () => ({
       asOf: CONTROLS_AS_OF,
       profiles: controlProfiles.map(controlProfileRecord),
+      families: familiesRecord(),
       controls: controls.map(controlRecord),
       crosswalk: crosswalkRecord(buildControlsCrosswalk(controls)),
     }),
     properties: {
       asOf: s.date('Date the profiles were last checked against their sources.'),
       profiles: s.arr(controlProfileSchema, 'The control profiles.'),
+      families: familiesSchema,
       controls: s.arr(controlSchema, 'Every control, in profile and id order.'),
       crosswalk: crosswalkSchema,
     },
@@ -2144,7 +2200,7 @@ export function controlDocumentSchema(): JsonSchema {
   };
 }
 
-export function controlDocument(row: Control): Record<string, unknown> {
+export function controlDocument(row: ClassifiedControl): Record<string, unknown> {
   return {
     ...envelope('control', 1, abs(controlApiPath(row)), controlPath(row)),
     control: controlRecord(row),

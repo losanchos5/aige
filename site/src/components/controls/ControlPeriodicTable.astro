@@ -21,7 +21,7 @@
 import '../../styles/chart.css';
 import '../../styles/control-marks.css';
 import '../../styles/control-visuals.css';
-import { controlsIn, depthLabels, CONTROLS_AS_OF, type Control, type ControlDepth, type ControlProfile } from '../../data/controls';
+import { controlsIn, depthLabels, depthLabel, CONTROLS_AS_OF, type Control, type ControlDepth, type ControlProfile } from '../../data/controls';
 import { layers } from '../../data/stack';
 import { STAGES, RESPONSES, responseOf, responseWords, responseClass, tileHref } from '../../lib/page-visuals/control-visuals';
 
@@ -37,7 +37,7 @@ const acts = (c: Control) => STAGES.filter((s) => (c.enforcementPoints as readon
 const facts = (c: Control) =>
   `. Layer ${pad(c.layer)} ${layerName(c.layer)}. Acts at ${acts(c)
     .map((s) => s.label.toLowerCase())
-    .join(' and ')}. ${responseWords[responseOf(c)]}. ${depthLabels[c.depth]}.`;
+    .join(' and ')}. ${responseWords[responseOf(c)]}. ${depthLabel(c)}.`;
 
 const count = <T,>(values: T[], v: T) => values.filter((x) => x === v).length;
 const responses = RESPONSES.map((r) => ({ r, n: count(rows.map(responseOf), r) })).filter((x) => x.n > 0);
@@ -152,7 +152,7 @@ const tableCaption = `The ${profile.shortTitle.toLowerCase()} controls with thei
                 <td>Layer {pad(c.layer)} {layerName(c.layer)}</td>
                 <td>{acts(c).map((s) => s.label).join(', ')}</td>
                 <td>{responseWords[responseOf(c)]}</td>
-                <td>{depthLabels[c.depth]}</td>
+                <td>{depthLabel(c)}</td>
               </tr>
             ))
           }

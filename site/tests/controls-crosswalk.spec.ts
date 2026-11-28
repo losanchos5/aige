@@ -17,6 +17,8 @@ import { validate } from './helpers/json-schema-lite';
 import { controls, controlPath, type Control } from '../src/data/controls';
 import { obligationById } from '../src/data/frameworks';
 import { threatById, threats } from '../src/data/threats';
+import { gpaiMeasureById } from '../src/data/gpai-code';
+import { aicmV11ControlById } from '../src/data/csa-aicm';
 import { patterns } from '../src/data/patterns';
 import { chapters } from '../src/data/chapters';
 import { schemaOrder } from '../src/data/templates';
@@ -29,6 +31,7 @@ import {
   profileCrosswalk,
   crosswalkProfiles,
   CONTROLS_CROSSWALK_PATH,
+  NOT_VERIFIED_NOTE,
   CROSSWALK_DESCRIPTION,
   CROSSWALK_TITLE,
 } from '../src/lib/controls-crosswalk';
@@ -92,6 +95,7 @@ function registryPairs(rows: readonly Control[]): Set<string> {
     }
     for (const id of m.csaAicm ?? []) add('csa-aicm', id);
     for (const id of m.aiuc1 ?? []) add('aiuc1', id);
+    for (const id of m.gpaiCode ?? []) add('gpai-code', id);
     for (const o of m.other ?? []) {
       if (/^NIST SP 800-53\b/.test(o.framework)) add('nist-sp-800-53', o.ref.split('-')[0]);
       else if (o.framework === 'MITRE ATLAS') add('mitre-atlas', o.ref);
@@ -180,6 +184,25 @@ test.describe('controls crosswalk data', () => {
     expect(fw.rows[0]).toMatchObject({ ref: t.externalId, name: t.name, url: t.url, controls: [first.id, second.id] });
   });
 
+  test('a row with no verified date says so; GPAI Code and CSA AICM rows carry their source url and date (synthetic mappings)', () => {
+    // No ISO/IEC 42001 row has been checked against the paywalled standard.
+    const iso = buildControlsCrosswalk().frameworks.find((f) => f.id === 'iso42001')!;
+    expect(iso.rows.length).toBeGreaterThan(0);
+    for (const r of iso.rows) expect(r, r.ref).toMatchObject({ verified: null, unverified: true, note: NOT_VERIFIED_NOTE });
+    expect(crosswalkMarkdown()).toContain(NOT_VERIFIED_NOTE);
+
+    // The live registry maps nothing to the two new frameworks yet: feed it a control that does.
+    const none = { obligations: [], iso42001: [], nistAiRmf: [], owasp: [] };
+    const row: Control = { ...controls[0], mappings: { ...none, gpaiCode: ['S3.2'], csaAicm: ['GRC-01'] } };
+    const frameworks = buildControlsCrosswalk([row]).frameworks;
+    const gpai = frameworks.find((f) => f.id === 'gpai-code')!.rows[0];
+    expect(gpai).toMatchObject({ ref: 'S3.2', verified: gpaiMeasureById('S3.2')!.verified, unverified: false, note: null, controls: [row.id] });
+    expect(gpai.url).toBe(gpaiMeasureById('S3.2')!.url);
+    const aicm = frameworks.find((f) => f.id === 'csa-aicm')!.rows[0];
+    expect(aicm).toMatchObject({ ref: 'GRC-01', verified: aicmV11ControlById('GRC-01')!.verified, unverified: false });
+    expect(aicm.url).toBe(aicmV11ControlById('GRC-01')!.url);
+  });
+
   test('the reverse view covers every live control of every profile', () => {
     for (const profile of crosswalkProfiles()) {
       const rows = profileCrosswalk(profile.slug);
@@ -224,6 +247,9 @@ test.describe('controls crosswalk in dist', () => {
     expect(page).toEqual(registry);
     expect(json).toEqual(registry);
     // One table per framework of the JSON, none for a framework without mappings.
+    // The JSON says which rows are not verified against the primary source.
+    const iso = (doc.crosswalk as { frameworks: { id: string; rows: Json[] }[] }).frameworks.find((fw) => fw.id === 'iso42001')!;
+    for (const r of iso.rows) expect(r, String(r.ref)).toMatchObject({ verified: null, unverified: true, note: NOT_VERIFIED_NOTE });
     const sections = [...main.matchAll(/data-crosswalk-framework="([^"]+)"/g)].map((m) => decode(m[1]));
     expect(sections).toEqual((doc.crosswalk as { frameworks: JsonFramework[] }).frameworks.map((fw) => fw.id));
   });

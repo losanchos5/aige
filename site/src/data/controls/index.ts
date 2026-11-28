@@ -68,6 +68,8 @@ import { personById } from '../people';
 import { chapters } from '../chapters';
 import { site } from '../site';
 import { aiuc1ById } from '../aiuc1';
+import { aicmV11ControlById } from '../csa-aicm';
+import { gpaiMeasureById } from '../gpai-code';
 import { nistAiRmfSubcategories } from '../nist-ai-rmf';
 import {
   evaluationEnvironmentProfile,
@@ -93,6 +95,7 @@ import {
 } from './deployment-and-monitoring';
 import { CONTROL_ID_PATTERN } from './ids';
 import { withImdaAgentic } from './imda-agentic';
+import { ACTORS, classification, familyById, familyProblems, isIsoDate, withClassification, type Actor } from './families';
 
 export const CONTROLS_AS_OF = '2026-09-26';
 
@@ -113,7 +116,7 @@ export type { ObservationExample };
 export const CONTROL_PAGES_ENABLED = true;
 
 /** Profile slugs that name static routes under /controls/, never a profile. */
-export const RESERVED_PROFILE_SLUGS: readonly string[] = ['crosswalk', 'examples', 'index'];
+export const RESERVED_PROFILE_SLUGS: readonly string[] = ['crosswalk', 'examples', 'families', 'index'];
 
 /** The shape of a DOI (10.<registrant>/<suffix>). */
 export const DOI_PATTERN = /^10\.\d{4,9}\/\S+$/;
@@ -195,16 +198,18 @@ export interface ControlMappings {
   atlas?: readonly string[];
   /** AIUC-1 requirement ids (A001 ... F002), only when read on the public page. */
   aiuc1?: readonly string[];
-  /** CSA AICM control ids, only when verified. */
+  /** CSA AICM v1.1 control ids (./csa-aicm.ts), only when verified. */
   csaAicm?: readonly string[];
+  /** GPAI Code of Practice measure ids (./gpai-code.ts, "S3.2"), only when verified. */
+  gpaiCode?: readonly string[];
   /** Anything else (NIST SP 800-53, RFC 8693, ATLAS mitigations...). */
   other?: readonly { framework: string; ref: string; note?: string }[];
 }
 
 /** One piece of site material a derived control restates. */
 export interface ControlSource {
-  kind: 'pattern' | 'schema' | 'chapter';
-  /** Pattern slug, record schema id or chapter slug. */
+  kind: 'pattern' | 'schema' | 'chapter' | 'source';
+  /** Pattern slug, record schema id, chapter slug, or (kind 'source') the url of an entry in the same control's `references`. */
   ref: string;
 }
 
@@ -244,6 +249,20 @@ export interface Control {
   /** Site material a derived control restates: a pattern slug (./patterns.ts),
    *  a record schema id (./templates.ts schemaOrder) or a chapter slug (./chapters.ts). */
   derivedFrom?: readonly ControlSource[];
+  /**
+   * Primary family (./families.ts), one of the 18. The first five profiles get
+   * it, `secondaryFamilies` and `appliesTo` from ./families.ts `classification`
+   * (applied below); a later profile declares them on the control. Optional in
+   * the type only so the profile files stay as they were: controlProblems()
+   * fails a control without `family`, `appliesTo` or `mappingsReviewed`.
+   */
+  family?: string;
+  /** 0 to 2 further families, distinct and never the primary. */
+  secondaryFamilies?: readonly string[];
+  /** The actors the control applies to, 1 to 3. */
+  appliesTo?: readonly Actor[];
+  /** YYYY-MM-DD the control's mappings to frameworks and laws were last reviewed. */
+  mappingsReviewed?: string;
   mappings: ControlMappings;
   references: readonly Source[];
   implementationNotes: readonly string[];
@@ -254,6 +273,9 @@ export interface Control {
   /** Meta description for the control's own page (specified controls only; 70 to 160 characters). */
   pageDescription?: string;
 }
+
+/** A control as the registry publishes it: classified (family, actors) and dated. */
+export type ClassifiedControl = Control & Required<Pick<Control, 'family' | 'appliesTo' | 'mappingsReviewed'>>;
 
 /** Alias kept for callers that name the definition rather than the record. */
 export type ControlDef = Control;
@@ -306,6 +328,13 @@ export const depthLabels: Readonly<Record<ControlDepth, string>> = {
   stub: 'Draft outline',
 };
 
+/** The depth label of one control: a derived control whose only origins are primary sources says so. */
+export function depthLabel(c: Pick<Control, 'depth' | 'seeds' | 'derivedFrom'>): string {
+  const origins = c.derivedFrom ?? [];
+  const onlySources = c.depth === 'derived' && c.seeds.length === 0 && origins.length > 0 && origins.every((o) => o.kind === 'source');
+  return onlySources ? 'Derived from a primary source' : depthLabels[c.depth];
+}
+
 // ---------------------------------------------------------------------------
 // The registry
 
@@ -317,15 +346,17 @@ export const profiles: readonly ControlProfile[] = [
   deploymentAndMonitoringProfile,
 ];
 
-// Each control gains its IMDA Agentic AI cross-reference here (./imda-agentic.ts),
-// so the profile files stay as derived and the cross-reference lives in one place.
-export const controls: readonly Control[] = [
+// Each control gains its IMDA Agentic AI cross-reference here (./imda-agentic.ts)
+// and its family and actors (./families.ts), so the profile files stay as they
+// were and each addition lives in one place. controlProblems() rejects a
+// control that ends up without a family, an actor or a mappings date.
+export const controls: readonly ClassifiedControl[] = ([
   ...evaluationEnvironmentControls,
   ...agentRuntimeControls,
   ...dataAdmissionAndPrivacyControls,
   ...assuranceAndEvidenceControls,
   ...deploymentAndMonitoringControls,
-].map(withImdaAgentic);
+].map(withImdaAgentic) as Control[]).map(withClassification);
 
 /**
  * Example observations of every profile (public/controls/examples/), one pass
@@ -347,13 +378,13 @@ export function profileBySlug(slug: string): ControlProfile | undefined {
 }
 
 /** The control with this id, if any (ids are case-insensitive in URLs). */
-export function controlById(id: string): Control | undefined {
+export function controlById(id: string): ClassifiedControl | undefined {
   const wanted = id.toUpperCase();
   return controls.find((c) => c.id === wanted);
 }
 
 /** Controls of one profile, in id order. */
-export function controlsIn(slug: string): Control[] {
+export function controlsIn(slug: string): ClassifiedControl[] {
   return controls.filter((c) => c.profile === slug);
 }
 
@@ -498,7 +529,6 @@ export function otherFrameworkId(name: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 const VERSION = /^\d+\.\d+(?:\.\d+)?$/;
 const KEBAB = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const LAYERS: readonly number[] = [1, 2, 3, 4, 5];
@@ -565,6 +595,7 @@ export function controlRegistryProblems(registry: ControlRegistry): string[] {
   const schemaIds = new Set([...schemaOrder, 'control-observation']);
   const chapterSlugs = new Set(chapters.map((ch) => ch.slug));
   const profileSlugs = new Set<string>();
+  problems.push(...familyProblems());
   // Kebab id -> the first "other" framework name that produced it.
   const otherFrameworks = new Map<string, string>();
 
@@ -585,7 +616,7 @@ export function controlRegistryProblems(registry: ControlRegistry): string[] {
     if (!p.title.trim() || !p.shortTitle.trim()) problems.push(`${at}: empty title`);
     if (!p.summary.trim() || !p.scope.trim()) problems.push(`${at}: empty summary or scope`);
     if (!VERSION.test(p.version)) problems.push(`${at}: bad version ${p.version}`);
-    if (!ISO_DATE.test(p.published) || !ISO_DATE.test(p.updated)) problems.push(`${at}: dates must be YYYY-MM-DD`);
+    if (!isIsoDate(p.published) || !isIsoDate(p.updated)) problems.push(`${at}: dates must be YYYY-MM-DD`);
     if (p.updated < p.published) problems.push(`${at}: updated before published`);
     if (p.authors.length === 0) problems.push(`${at}: names no author`);
     for (const id of [...p.authors, ...p.reviewers]) {
@@ -596,7 +627,7 @@ export function controlRegistryProblems(registry: ControlRegistry): string[] {
     }
     if (p.changelog.length === 0) problems.push(`${at}: empty changelog`);
     for (const entry of p.changelog) {
-      if (!VERSION.test(entry.version) || !ISO_DATE.test(entry.date) || !entry.note.trim()) {
+      if (!VERSION.test(entry.version) || !isIsoDate(entry.date) || !entry.note.trim()) {
         problems.push(`${at}: malformed changelog entry ${entry.version}`);
       }
     }
@@ -679,12 +710,38 @@ export function controlRegistryProblems(registry: ControlRegistry): string[] {
         if (!recordSchemaIds.has(src.ref)) problems.push(`${at}: derivedFrom names unknown record schema ${src.ref}`);
       } else if (src.kind === 'chapter') {
         if (!chapterSlugs.has(src.ref)) problems.push(`${at}: derivedFrom names unknown chapter ${src.ref}`);
+      } else if (src.kind === 'source') {
+        const ref = c.references.find((r) => r.url === src.ref);
+        if (!ref) problems.push(`${at}: derivedFrom source ${src.ref} is not one of the control's references`);
+        else {
+          if (ref.verified !== 'primary') problems.push(`${at}: derivedFrom source ${src.ref} must be a primary source, is ${ref.verified}`);
+          // Source has a publication date only, so the full date stands for the date it was read.
+          if (!isIsoDate(ref.date)) problems.push(`${at}: derivedFrom source ${src.ref} needs a full YYYY-MM-DD date`);
+        }
       } else {
         problems.push(`${at}: unknown derivedFrom kind ${String((src as { kind: unknown }).kind)}`);
       }
     }
 
+    // Family, actors and mappings date
+    if (c.family === undefined || !familyById(c.family)) problems.push(`${at}: unknown or missing family ${String(c.family)}`);
+    const secondary = c.secondaryFamilies ?? [];
+    if (secondary.length > 2) problems.push(`${at}: more than two secondary families`);
+    if (new Set(secondary).size !== secondary.length) problems.push(`${at}: repeated secondary family`);
+    for (const f of secondary) {
+      if (!familyById(f)) problems.push(`${at}: unknown secondary family ${f}`);
+      if (f === c.family) problems.push(`${at}: secondary family repeats the primary ${f}`);
+    }
+    const actors = c.appliesTo ?? [];
+    if (actors.length < 1 || actors.length > 3) problems.push(`${at}: appliesTo needs 1 to 3 actors, has ${actors.length}`);
+    if (new Set(actors).size !== actors.length) problems.push(`${at}: repeated actor in appliesTo`);
+    for (const a of actors) if (!ACTORS.includes(a)) problems.push(`${at}: unknown actor ${String(a)}`);
+    if (c.mappingsReviewed === undefined || !isIsoDate(c.mappingsReviewed)) problems.push(`${at}: mappingsReviewed must be YYYY-MM-DD`);
+
     const m = c.mappings;
+    if (m.obligations.some((id) => /EUAIA-ART53|EUAIA-ART55|GPAICOP/.test(id)) && !actors.includes('gpai-provider')) {
+      problems.push(`${at}: maps a general-purpose AI model obligation but appliesTo lacks gpai-provider`);
+    }
     for (const id of m.obligations) {
       if (!OBLIGATION_ID_PATTERN.test(id)) problems.push(`${at}: malformed obligation id ${id}`);
       else if (!obligationIds.has(id)) problems.push(`${at}: unknown obligation ${id}`);
@@ -707,7 +764,14 @@ export function controlRegistryProblems(registry: ControlRegistry): string[] {
       else if (!requirement) problems.push(`${at}: AIUC-1 id ${id} is not in the public index (src/data/aiuc1.ts)`);
       else if (requirement.retired) problems.push(`${at}: AIUC-1 requirement ${id} is retired`);
     }
-    for (const id of m.csaAicm ?? []) if (!/^[A-Z&]{2,4}-\d{2}$/.test(id)) problems.push(`${at}: malformed CSA AICM id ${id}`);
+    for (const id of m.csaAicm ?? []) {
+      if (!/^[A-Z&]{2,4}-\d{2}$/.test(id)) problems.push(`${at}: malformed CSA AICM id ${id}`);
+      else if (!aicmV11ControlById(id)) problems.push(`${at}: CSA AICM id ${id} is not in the v1.1 table (src/data/csa-aicm.ts)`);
+    }
+    for (const id of m.gpaiCode ?? []) {
+      if (!/^[TCS]\d+\.\d+$/.test(id)) problems.push(`${at}: malformed GPAI Code measure id ${id}`);
+      else if (!gpaiMeasureById(id)) problems.push(`${at}: GPAI Code measure ${id} is not in the table (src/data/gpai-code.ts)`);
+    }
     for (const o of m.other ?? []) {
       if (!o.framework.trim() || !o.ref.trim()) problems.push(`${at}: incomplete "other" mapping`);
       const fwId = otherFrameworkId(o.framework);
@@ -776,6 +840,9 @@ export function controlRegistryProblems(registry: ControlRegistry): string[] {
   }
   for (const id of retiredControlIds) {
     if (!CONTROL_ID_PATTERN.test(id)) problems.push(`controls: malformed retired id ${id}`);
+  }
+  for (const id of Object.keys(classification)) {
+    if (!ids.has(id)) problems.push(`families: classification row ${id} matches no control`);
   }
 
   // Example observations: each names a specified control and its own file.

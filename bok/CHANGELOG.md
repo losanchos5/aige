@@ -70,6 +70,11 @@ technical review and none reviewed yet.
   observations, after a source-by-source review.
 - Profile dates in the sitemap and JSON-LD come from each profile's `updated` date; counts in
   `/controls`, `/frontier`, `llms.txt` and the tests are read from the registry.
+- Open data API, 2026-11-28: in `/api/v1/controls.json` and `/api/v1/controls/<id>.json` every
+  control gains `family`, `secondaryFamilies`, `appliesTo` and `mappingsReviewed`, and
+  `controls.json` gains `families`. The ISO/IEC 42001 rows of its `crosswalk` now carry a source
+  `url` and a note where both were null. Clients that validate against a pinned copy of the
+  control schema must refresh it.
 
 ### First iteration (open-reference-project)
 

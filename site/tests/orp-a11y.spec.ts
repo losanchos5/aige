@@ -19,6 +19,7 @@ const ROUTES = [
   '/controls',
   '/controls/evaluation-environment',
   '/controls/agent-runtime',
+  '/controls/families',
   '/frontier',
   '/research',
   NOTE,

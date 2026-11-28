@@ -8,7 +8,7 @@
 import * as z from 'zod';
 
 import { CANONICAL_SITE } from '../data.js';
-import type { ControlProfile, ControlRecord } from '../types.js';
+import type { ControlFamily, ControlProfile, ControlRecord } from '../types.js';
 import { normalise, slugKey, suggest, tokens } from '../text.js';
 import {
   READ_ONLY,
@@ -28,6 +28,8 @@ export const CONTROLS_PAGE = `${CANONICAL_SITE}/controls`;
 
 const STATUSES = ['draft', 'in-review', 'stable', 'retired'] as const;
 const DEPTHS = ['specified', 'derived', 'stub'] as const;
+/** The actors of the control schema; fixed, so a filter is valid even when no control in the data carries it. */
+const ACTORS: readonly string[] = ['provider', 'deployer', 'gpai-provider'];
 
 /** Find a control by id (any case, with or without the AIGE- prefix), page or JSON URL, or title. */
 export function findControl(rows: ControlRecord[], wanted: string): ControlRecord | undefined {
@@ -74,6 +76,9 @@ const listItem = z.object({
   layer: z.number().int(),
   layerName: z.string().nullable(),
   secondaryLayers: z.array(z.number().int()),
+  family: z.string().describe('Id of the primary family (see `families` in list_controls).'),
+  secondaryFamilies: z.array(z.string()).describe('Up to two further families.'),
+  appliesTo: z.array(z.string()).describe('Actors the control applies to: provider, deployer, gpai-provider.'),
   objective: z.string(),
   url: z.string().describe('The control on its profile page.'),
   json: z.string().describe('The control record on its own, in the API.'),
@@ -90,6 +95,9 @@ function item(row: ControlRecord): z.infer<typeof listItem> {
     layer: row.layer,
     layerName: layerName(row.layer),
     secondaryLayers: row.secondaryLayers,
+    family: row.family ?? '',
+    secondaryFamilies: row.secondaryFamilies ?? [],
+    appliesTo: row.appliesTo ?? [],
     objective: row.objective,
     url: row.url,
     json: row.json,
@@ -122,6 +130,18 @@ function profileOf(p: ControlProfile): z.infer<typeof profileItem> {
   };
 }
 
+const familyItem = z.object({
+  id: z.string(),
+  title: z.string(),
+  definition: z.string().describe('The outcome the family secures.'),
+  controlCount: z.number().int().describe('Controls whose primary family it is.'),
+  secondaryControlCount: z.number().int().describe('Controls that list it as a secondary family.'),
+});
+
+function familyOf(f: ControlFamily): z.infer<typeof familyItem> {
+  return { id: f.id, title: f.title, definition: f.definition, controlCount: f.controlCount, secondaryControlCount: f.secondaryControlCount };
+}
+
 const threatRef = z.object({ id: z.string(), externalId: z.string(), name: z.string(), url: z.string() });
 
 const recordShape = {
@@ -145,6 +165,7 @@ const recordShape = {
       atlas: z.array(threatRef),
       aiuc1: z.array(z.string()),
       csaAicm: z.array(z.string()),
+      gpaiCode: z.array(z.string()),
       other: z.array(z.object({ framework: z.string(), ref: z.string(), note: z.string().nullable() })),
     })
     .describe('Illustrative mappings, not a claim of conformity.'),
@@ -157,6 +178,7 @@ const recordShape = {
     .object({ subjectKind: z.string(), expected: z.string(), observedExample: z.string() })
     .nullable()
     .describe('What an observation of the control records; null until the control is specified.'),
+  mappingsReviewed: z.string().describe("Date the control's mappings were last reviewed."),
   observationSchema: z.string().describe('Schema of a control observation record.'),
   examples: z
     .array(z.object({ status: z.string(), url: z.string() }))
@@ -184,6 +206,7 @@ function record(row: ControlRecord) {
       atlas: m.atlas.map((t) => ({ id: t.id, externalId: t.externalId, name: t.name, url: t.url })),
       aiuc1: m.aiuc1,
       csaAicm: m.csaAicm,
+      gpaiCode: m.gpaiCode ?? [],
       other: m.other.map((o) => ({ framework: o.framework, ref: o.ref, note: o.note })),
     },
     references: row.references.map((r) => ({ n: r.n, title: r.title, text: r.text, url: r.url, verified: r.verified })),
@@ -192,6 +215,7 @@ function record(row: ControlRecord) {
     observation: row.observation
       ? { subjectKind: row.observation.subjectKind, expected: row.observation.expected, observedExample: row.observation.observedExample }
       : null,
+    mappingsReviewed: row.mappingsReviewed ?? '',
     observationSchema: row.observationSchema,
     examples: row.examples.map((e) => ({ status: e.status, url: e.url })),
   };
@@ -212,9 +236,11 @@ export const registerControls: Register = (server, deps) => {
     {
       title: 'List controls',
       description:
-        'List the reference controls of the open control profiles (draft control specifications with stable ids such as AIGE-CTL-EVAL-002, open for technical review). All filters are optional and combine with AND: profile (a profile slug such as "evaluation-environment", or its title), layer (stack layer 1-5, primary or secondary), status (draft, in-review, stable, retired), depth (specified: written in full; derived: restates a chapter 23 seed; stub: outline with open questions) and query (words that must all appear in the id, title or objective). Returns ids for get_control, each control\'s profile, depth, status, layer, objective and URLs.',
+        'List the reference controls of the open control profiles (draft control specifications with stable ids such as AIGE-CTL-EVAL-002, open for technical review). All filters are optional and combine with AND: profile (a profile slug such as "evaluation-environment", or its title), family (a control family id such as "third-party"; matches the primary or a secondary family), actor (provider, deployer or gpai-provider), layer (stack layer 1-5, primary or secondary), status (draft, in-review, stable, retired), depth (specified: written in full; derived: restates a chapter 23 seed; stub: outline with open questions) and query (words that must all appear in the id, title or objective). Returns ids for get_control, each control\'s profile, family, actors, depth, status, layer, objective and URLs, and the list of families with their definition and number of controls. An unknown family or actor is an error that lists the valid values.',
       inputSchema: z.object({
         profile: z.string().min(2).max(200).optional().describe('Profile slug or title.'),
+        family: z.string().min(2).max(100).optional().describe('Control family id; matches the primary or a secondary family.'),
+        actor: z.string().min(2).max(50).optional().describe('Actor: provider, deployer or gpai-provider.'),
         layer: z.number().int().min(1).max(5).optional().describe('Stack layer, 1 to 5.'),
         status: z.enum(STATUSES).optional().describe('Publication status.'),
         depth: z.enum(DEPTHS).optional().describe('How far the control is written.'),
@@ -225,14 +251,16 @@ export const registerControls: Register = (server, deps) => {
         asOf: z.string().describe('Date the profiles were last checked against their sources.'),
         total: z.number().int(),
         profiles: z.array(profileItem).describe('The profiles the listed controls belong to.'),
+        families: z.array(familyItem).describe('Every control family, with its definition and number of controls.'),
         controls: z.array(listItem),
         ...provenanceShape,
       }),
       annotations: { title: 'List controls', ...READ_ONLY },
     },
-    async ({ profile, layer, status, depth, query }) =>
+    async ({ profile, family, actor, layer, status, depth, query }) =>
       guarded(deps, 'list_controls', async () => {
         const doc = await deps.data.controls();
+        const docFamilies = doc.families ?? [];
         let rows = doc.controls;
         let chosen: ControlProfile | undefined;
         if (profile) {
@@ -243,6 +271,16 @@ export const registerControls: Register = (server, deps) => {
           const slug = chosen.slug;
           rows = rows.filter((row) => row.profile === slug);
         }
+        if (family) {
+          if (!docFamilies.some((f) => f.id === family)) {
+            return fail(`Unknown family "${family}". Families: ${docFamilies.map((f) => f.id).join(', ')}.`);
+          }
+          rows = rows.filter((row) => row.family === family || (row.secondaryFamilies ?? []).includes(family));
+        }
+        if (actor) {
+          if (!ACTORS.includes(actor)) return fail(`Unknown actor "${actor}". Actors: ${ACTORS.join(', ')}.`);
+          rows = rows.filter((row) => (row.appliesTo ?? []).includes(actor));
+        }
         if (layer) rows = rows.filter((row) => row.layer === layer || row.secondaryLayers.includes(layer));
         if (status) rows = rows.filter((row) => row.status === status);
         if (depth) rows = rows.filter((row) => row.depth === depth);
@@ -251,10 +289,11 @@ export const registerControls: Register = (server, deps) => {
           rows = rows.filter((row) => matchesQuery(row, words));
         }
         const controls = rows.map(item);
+        const chosenFamily = docFamilies.find((f) => f.id === family);
         const used = new Set(rows.map((row) => row.profile));
         const profiles = doc.profiles.filter((p) => used.has(p.slug)).map(profileOf);
         const filters = Object.fromEntries(
-          Object.entries({ profile: chosen?.slug, layer, status, depth, query }).filter(([, v]) => v !== undefined),
+          Object.entries({ profile: chosen?.slug, family, actor, layer, status, depth, query }).filter(([, v]) => v !== undefined),
         ) as Record<string, string | number>;
         const p = provenanceOf(chosen?.url ?? CONTROLS_PAGE, doc.self, doc.version);
         const described = Object.entries(filters)
@@ -263,15 +302,16 @@ export const registerControls: Register = (server, deps) => {
         const text = [
           `${controls.length} control(s)${described ? ` (${described})` : ''}. Draft control specifications, checked against their sources on ${doc.asOf}; nothing here is reviewed or certified.`,
           ...profiles.map((pr) => `Profile: ${pr.title} v${pr.version} (${reviewLine(pr.status, pr.reviewerStatus)}) ${pr.url}`),
+          ...(chosenFamily ? [`Family ${chosenFamily.id}: ${chosenFamily.definition}`] : []),
           '',
           ...controls.map(
             (c) =>
-              `- ${c.id}: ${c.title} (${reviewLine(c.status, c.reviewerStatus, c.depth)}; ${layerLabel(c.layer)})\n  ${c.objective}\n  ${c.url}`,
+              `- ${c.id}: ${c.title} (${reviewLine(c.status, c.reviewerStatus, c.depth)}; ${layerLabel(c.layer)}; family ${c.family}; ${c.appliesTo.join(', ')})\n  ${c.objective}\n  ${c.url}`,
           ),
           controls.length === 0 ? 'No control matches. Drop a filter, or call list_controls without filters.' : '',
           footer(p),
         ].join('\n');
-        return ok(text, { filters, asOf: doc.asOf, total: controls.length, profiles, controls, ...p });
+        return ok(text, { filters, asOf: doc.asOf, total: controls.length, profiles, families: docFamilies.map(familyOf), controls, ...p });
       }),
   );
 
@@ -312,6 +352,7 @@ export const registerControls: Register = (server, deps) => {
           `Objective: ${row.objective}`,
           `Scope: ${row.scope}`,
           `Layers: ${[row.layer, ...row.secondaryLayers].map(layerLabel).join('; ')}`,
+          `Family: ${row.family ?? 'unknown'}${(row.secondaryFamilies ?? []).length > 0 ? ` (also ${(row.secondaryFamilies ?? []).join(', ')})` : ''}; applies to: ${(row.appliesTo ?? []).join(', ') || 'unknown'}; mappings reviewed ${row.mappingsReviewed ?? 'unknown'}`,
           `Enforcement points: ${row.enforcementPoints.join(', ')}`,
           '',
           bullets('Failure modes', full.failureModes),
@@ -334,6 +375,7 @@ export const registerControls: Register = (server, deps) => {
               m.atlas.length > 0 ? `MITRE ATLAS: ${m.atlas.map((t) => `${t.externalId} ${t.name}`).join('; ')}` : '',
               m.aiuc1.length > 0 ? `AIUC-1: ${m.aiuc1.join(', ')}` : '',
               m.csaAicm.length > 0 ? `CSA AICM: ${m.csaAicm.join(', ')}` : '',
+              (m.gpaiCode ?? []).length > 0 ? `GPAI Code of Practice: ${(m.gpaiCode ?? []).join(', ')}` : '',
               m.other.length > 0 ? `Other: ${m.other.map((o) => `${o.framework} ${o.ref}`).join('; ')}` : '',
             ].filter((line) => line !== ''),
           ),

@@ -419,26 +419,34 @@ describe('search_bok', () => {
 describe('list_controls', () => {
   it('lists every control of every profile with its status and URLs', async () => {
     const { text, data } = await call('list_controls', {});
-    const doc = JSON.parse(readFixture('api/v1/controls.json')) as { controls: { id: string }[]; profiles: unknown[] };
+    const doc = JSON.parse(readFixture('api/v1/controls.json')) as {
+      controls: { id: string; url: string; json: string }[];
+      profiles: unknown[];
+    };
     assert.equal(data.total, doc.controls.length);
     assert.deepEqual(data.controls.map((c: Structured) => c.id), doc.controls.map((c) => c.id));
     assert.equal(data.profiles.length, doc.profiles.length);
     const egress = data.controls.find((c: Structured) => c.id === 'AIGE-CTL-EVAL-002');
     assert.equal(egress.profile, 'evaluation-environment');
     assert.equal(egress.depth, 'specified');
-    assert.equal(egress.url, 'https://aigovernanceengineer.com/controls/evaluation-environment#aige-ctl-eval-002');
-    assert.equal(egress.json, 'https://aigovernanceengineer.com/api/v1/controls/aige-ctl-eval-002.json');
+    // Canonical shape: a specified control has a page of its own, any other one its profile anchor.
+    for (const c of data.controls as Structured[]) {
+      const slug = c.id.toLowerCase();
+      const shape = c.depth === 'specified' ? `/controls/${c.profile}/${slug}` : `/controls/${c.profile}#${slug}`;
+      assert.ok(c.url.endsWith(shape), `${c.id}: ${c.url}`);
+      assert.ok(c.json.endsWith(`/api/v1/controls/${slug}.json`), `${c.id}: ${c.json}`);
+    }
     assert.equal(data.source, 'https://aigovernanceengineer.com/controls');
     assert.match(text, /open for technical review/);
     assertProvenance(data, text);
   });
 
   it('filters by profile, depth, layer and free text', async () => {
+    const all = JSON.parse(readFixture('api/v1/controls.json')) as { controls: { id: string; profile: string; depth: string }[] };
+    const expected = all.controls.filter((c) => c.profile === 'evaluation-environment' && c.depth === 'specified').map((c) => c.id);
+    assert.ok(expected.length > 0 && expected.length < all.controls.length);
     const specified = await call('list_controls', { profile: 'evaluation-environment', depth: 'specified' });
-    assert.deepEqual(
-      specified.data.controls.map((c: Structured) => c.id),
-      ['AIGE-CTL-EVAL-002', 'AIGE-CTL-EVAL-003', 'AIGE-CTL-EVAL-006'],
-    );
+    assert.deepEqual(specified.data.controls.map((c: Structured) => c.id), expected);
     assert.equal(specified.data.source, 'https://aigovernanceengineer.com/controls/evaluation-environment');
     assert.deepEqual(specified.data.filters, { profile: 'evaluation-environment', depth: 'specified' });
 
@@ -459,6 +467,72 @@ describe('list_controls', () => {
     const { text, isError } = await call('list_controls', { profile: 'no-such-profile' });
     assert.equal(isError, true);
     assert.match(text, /evaluation-environment/);
+  });
+
+  it('filters by family (primary or secondary) and actor, and lists the families', async () => {
+    const doc = JSON.parse(readFixture('api/v1/controls.json')) as {
+      families: { id: string; definition: string; controlCount: number }[];
+      controls: { id: string; family: string; secondaryFamilies: string[]; appliesTo: string[] }[];
+    };
+    const unfiltered = await call('list_controls', {});
+    assert.deepEqual(unfiltered.data.families.map((f: Structured) => f.id), doc.families.map((f) => f.id));
+    assert.deepEqual(
+      unfiltered.data.families.map((f: Structured) => [f.definition, f.controlCount]),
+      doc.families.map((f) => [f.definition, f.controlCount]),
+    );
+    for (const c of unfiltered.data.controls) assert.ok(c.family && Array.isArray(c.secondaryFamilies) && c.appliesTo.length > 0, c.id);
+
+    const family = doc.families.find((f) => doc.controls.some((c) => c.secondaryFamilies.includes(f.id)))!.id;
+    const byFamily = await call('list_controls', { family });
+    assert.deepEqual(
+      byFamily.data.controls.map((c: Structured) => c.id),
+      doc.controls.filter((c) => c.family === family || c.secondaryFamilies.includes(family)).map((c) => c.id),
+    );
+    // A secondary match is in the list: the filter is not the primary family alone.
+    assert.ok(byFamily.data.controls.some((c: Structured) => c.family !== family));
+    assert.match(byFamily.text, new RegExp(`Family ${family}:`));
+
+    const gpai = await call('list_controls', { actor: 'gpai-provider' });
+    assert.deepEqual(
+      gpai.data.controls.map((c: Structured) => c.id),
+      doc.controls.filter((c) => c.appliesTo.includes('gpai-provider')).map((c) => c.id),
+    );
+    assert.ok(gpai.data.total > 0 && gpai.data.total < unfiltered.data.total);
+  });
+
+  it('still lists controls when the API document has none of the family fields', async () => {
+    const doc = JSON.parse(readFixture('api/v1/controls.json')) as { controls: Record<string, unknown>[]; families?: unknown };
+    const older = {
+      ...doc,
+      families: undefined,
+      controls: doc.controls.map(({ family, secondaryFamilies, appliesTo, mappingsReviewed, ...rest }) => rest),
+    };
+    // Its own server and app: the shared app has already cached the current controls document.
+    const oldFixtures = await startFixtureServer();
+    oldFixtures.override('/api/v1/controls.json', JSON.stringify(older));
+    const oldApp = await startApp(oldFixtures);
+    const oldClient = await connect(oldApp.url);
+    try {
+      const result = await oldClient.callTool({ name: 'list_controls', arguments: {} });
+      assert.notEqual(result.isError, true);
+      const data = (result.structuredContent ?? {}) as Structured;
+      assert.equal(data.total, doc.controls.length);
+      assert.deepEqual(data.families, []);
+    } finally {
+      await oldClient.close();
+      await oldApp.close();
+      await oldFixtures.close();
+    }
+  });
+
+  it('rejects an unknown family or actor with the valid values', async () => {
+    const family = await call('list_controls', { family: 'no-such-family' });
+    assert.equal(family.isError, true);
+    assert.match(family.text, /third-party/);
+    const actor = await call('list_controls', { actor: 'regulator' });
+    assert.equal(actor.isError, true);
+    assert.match(actor.text, /deployer/);
+    assert.match(actor.text, /gpai-provider/);
   });
 });
 
@@ -499,10 +573,13 @@ describe('get_control', () => {
     }
   });
 
-  it('returns a stub with a null observation and no examples', async () => {
-    const { data, isError } = await call('get_control', { id: 'AIGE-CTL-EVAL-001' });
+  it('returns a control that is not yet specified with a null observation and no examples', async () => {
+    // The fixture has no stub any more: a derived control without an observation is the same rendering.
+    const all = JSON.parse(readFixture('api/v1/controls.json')) as { controls: { id: string; depth: string; observation: unknown }[] };
+    const unspecified = all.controls.find((c) => c.depth !== 'specified' && c.observation === null)!;
+    const { data, isError } = await call('get_control', { id: unspecified.id });
     assert.equal(isError, false);
-    assert.equal(data.depth, 'stub');
+    assert.equal(data.depth, unspecified.depth);
     assert.equal(data.observation, null);
     assert.deepEqual(data.examples, []);
     assert.ok(data.openQuestions.length > 0);
