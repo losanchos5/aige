@@ -4,7 +4,7 @@
 // /api/v1/schemas/control.json. Draft control specifications, open for
 // technical review; not a claim of conformity.
 import type { APIRoute, GetStaticPaths } from 'astro';
-import { controls, controlSlug, type Control } from '../../../../data/controls';
+import { controls, controlSlug, type ClassifiedControl } from '../../../../data/controls';
 import { controlDocument, jsonResponse } from '../../../../lib/api';
 
 export const getStaticPaths = (() =>
@@ -13,5 +13,5 @@ export const getStaticPaths = (() =>
     props: { row },
   }))) satisfies GetStaticPaths;
 
-export const GET: APIRoute<{ row: Control }> = ({ props }) =>
+export const GET: APIRoute<{ row: ClassifiedControl }> = ({ props }) =>
   jsonResponse(controlDocument(props.row));

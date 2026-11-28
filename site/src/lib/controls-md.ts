@@ -28,7 +28,9 @@ import {
   statusLabels,
   reviewerStatusLabels,
   depthLabels,
+  depthLabel,
 } from '../data/controls';
+import { familyById, familyPath } from '../data/controls/families';
 import { enforcementLabels, effectLabels } from '../data/policy-card';
 import { layers } from '../data/stack';
 import { getPatternBySlug, patternPath, type PatternDef } from '../data/patterns';
@@ -194,7 +196,7 @@ export interface DerivedSource {
 const chapterName = (title: string): string => title.replace(/^\d+\.\s*/, '');
 
 /** The material a control restates, in the order seeds, then `derivedFrom`; empty for a control with none. */
-export function derivedSources(c: Pick<Control, 'seeds' | 'derivedFrom'>): DerivedSource[] {
+export function derivedSources(c: Pick<Control, 'seeds' | 'derivedFrom' | 'references'>): DerivedSource[] {
   const out: DerivedSource[] = [];
   if (c.seeds.length > 0) out.push({ label: 'the agent controls of chapter 23', href: agentChapter });
   for (const src of c.derivedFrom ?? []) {
@@ -203,6 +205,9 @@ export function derivedSources(c: Pick<Control, 'seeds' | 'derivedFrom'>): Deriv
       out.push({ label: `the ${p?.title ?? src.ref} pattern`, href: p ? patternPath(p) : `/patterns/${src.ref}` });
     } else if (src.kind === 'schema') {
       out.push({ label: `the ${src.ref}.v1 record schema`, href: `/resources/templates#schema-${src.ref}` });
+    } else if (src.kind === 'source') {
+      // ref is the url of one of the control's own references (the validator checks it).
+      out.push({ label: c.references.find((r) => r.url === src.ref)?.title ?? src.ref, href: src.ref });
     } else {
       const ch = getChapterBySlug(src.ref);
       out.push({
@@ -237,8 +242,9 @@ export function derivedPhrase(slug: string): string {
     pattern: 'site patterns',
     schema: 'record schemas',
     chapter: 'chapters of the Body of Knowledge',
+    source: 'primary sources',
   };
-  return listText(['seed', 'pattern', 'schema', 'chapter'].filter((k) => kinds.has(k)).map((k) => words[k]));
+  return listText(['seed', 'pattern', 'schema', 'chapter', 'source'].filter((k) => kinds.has(k)).map((k) => words[k]));
 }
 
 /** A profile's depth counts as prose: "9 specified", "31 derived from chapter 23", "2 draft outlines". */
@@ -309,8 +315,10 @@ function controlBullets(c: Control, sources: readonly Source[]): string {
   bullets.push(`- Id: \`${c.id}\` · v${c.version} · ${statusLabels[c.status]} · ${reviewerStatusLabels[c.reviewerStatus]}`);
   const restates = c.depth === 'derived' ? derivedSources(c) : [];
   bullets.push(
-    `- Depth: ${depthLabels[c.depth]}${restates.length > 0 ? ` (${restates.map((s) => link(s.label, s.href)).join('; ')})` : ''}`,
+    `- Depth: ${depthLabel(c)}${restates.length > 0 ? ` (${restates.map((s) => (s.href.startsWith('https://') ? `[${s.label}](${s.href})` : link(s.label, s.href))).join('; ')})` : ''}`,
   );
+  const family = c.family ? familyById(c.family) : undefined;
+  if (family) bullets.push(`- Family: ${link(family.title, familyPath(family.id))}`);
   bullets.push(`- Objective: ${c.objective}`);
   bullets.push(c.failureModes.length > 0 ? '- Failure modes:' : `- Failure modes: ${TBD}`, ...nested(c.failureModes));
   bullets.push(`- Scope: ${c.scope}`);
@@ -363,8 +371,10 @@ function controlBullets(c: Control, sources: readonly Source[]): string {
   if ((m.atlas ?? []).length > 0) maps.push(`MITRE ATLAS: ${threatLinks(m.atlas ?? [])}`);
   if ((m.aiuc1 ?? []).length > 0) maps.push(`AIUC-1: ${(m.aiuc1 ?? []).join(', ')}`);
   if ((m.csaAicm ?? []).length > 0) maps.push(`CSA AICM: ${(m.csaAicm ?? []).join(', ')}`);
+  if ((m.gpaiCode ?? []).length > 0) maps.push(`GPAI Code of Practice: ${(m.gpaiCode ?? []).join(', ')}`);
   for (const o of m.other ?? []) maps.push(`${o.framework}: ${o.ref}${o.note ? ` (${o.note})` : ''}`);
   if (maps.length > 0) bullets.push('- Mappings:', ...nested(maps));
+  if (c.mappingsReviewed) bullets.push(`- Mappings reviewed: ${c.mappingsReviewed} (date the mappings above were last reviewed)`);
 
   if (c.references.length > 0) {
     bullets.push(

@@ -217,6 +217,7 @@ export interface ControlMappings {
   atlas: ControlThreatRef[];
   aiuc1: string[];
   csaAicm: string[];
+  gpaiCode?: string[];
   other: { framework: string; ref: string; note: string | null }[];
 }
 
@@ -239,6 +240,11 @@ export interface ControlRecord {
   failureResponse: { effect: string; text: string };
   layer: number;
   secondaryLayers: number[];
+  // The four fields below are absent from an older API response.
+  family?: string;
+  secondaryFamilies?: string[];
+  appliesTo?: string[];
+  mappingsReviewed?: string;
   patterns: { slug: string; title: string; url: string }[];
   seeds: { id: string; title: string; url: string }[];
   mappings: ControlMappings;
@@ -250,8 +256,21 @@ export interface ControlRecord {
   examples: { status: string; url: string }[];
 }
 
+export interface ControlFamily {
+  id: string;
+  order: number;
+  title: string;
+  definition: string;
+  anchors: { framework: string; ref: string; url: string; read: string }[];
+  /** Controls whose primary family it is. */
+  controlCount: number;
+  secondaryControlCount: number;
+}
+
 export interface ControlsDoc extends Envelope {
   asOf: string;
   profiles: ControlProfile[];
+  /** Absent from an older API response. */
+  families?: ControlFamily[];
   controls: ControlRecord[];
 }

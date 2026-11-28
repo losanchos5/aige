@@ -40,6 +40,7 @@ import {
   depthLabels,
   CONTROLS_AS_OF,
 } from '../../data/controls';
+import { families } from '../../data/controls/families';
 import { layers } from '../../data/stack';
 import { site } from '../../data/site';
 import { depthCounts, derivedPhrase, profileReviewers, machineLinks, machineEvent } from '../../lib/controls-md';
@@ -319,6 +320,10 @@ const jsonLd = collectionPage({
         <a href="/controls/crosswalk">controls crosswalk</a>: for each obligation, clause or id,
         the controls that map to it, and for each profile, its controls with their ids per
         framework.
+      </p>
+      <p>
+        Browse them by outcome in the <a href="/controls/families">control families</a>: {families.length}
+        families, each with the primary sources behind it and the controls that secure that outcome.
       </p>
       <p>
         Public guidance from frontier developers and evaluators now uses the same terms for the

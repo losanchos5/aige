@@ -1,0 +1,127 @@
+---
+// /controls/families: the 18 control families (src/data/controls/families.ts),
+// the axis that cuts across the profiles. Each family in order: its definition,
+// what it leaves out, the primary sources that anchor it, and the controls whose
+// primary family it is; the counts are computed from the registry at build time,
+// and a family with no control is shown with count 0. Static: no client script.
+//
+// Illustrative, not a claim of conformity: the controls are drafts open for
+// technical review.
+import Doc from '../../layouts/Doc.astro';
+import Byline from '../../components/Byline.astro';
+import Callout from '../../components/Callout.astro';
+import { controls, controlPath, controlProblems, controlsUpdated, profilePath } from '../../data/controls';
+import { families } from '../../data/controls/families';
+import { collectionPage } from '../../lib/jsonld';
+
+// Literals, so lib/llms-routes.ts can read them.
+const title = 'AI governance control families';
+const description =
+  'The families that group the open AI governance controls by the outcome they secure, with each definition, its primary-source anchors and its controls.';
+
+const problems = controlProblems();
+if (problems.length > 0) {
+  throw new Error(`controls: ${problems.length} problem(s) in the registry:\n${problems.join('\n')}`);
+}
+
+const path = '/controls/families';
+const updated = controlsUpdated();
+const rows = families.map((family) => ({
+  family,
+  primary: controls.filter((c) => c.family === family.id),
+  secondary: controls.filter((c) => (c.secondaryFamilies ?? []).includes(family.id)).length,
+}));
+const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+
+const headings = rows.map(({ family }) => ({ depth: 2, slug: family.id, text: `${family.order}. ${family.title}` }));
+const crumbs = [{ label: 'Open control profiles', href: '/controls' }, { label: 'Families' }];
+
+const jsonLd = collectionPage({
+  path,
+  name: title,
+  description,
+  dateModified: updated,
+  items: families.map((f) => ({ name: f.title, url: `${path}#${f.id}` })),
+});
+---
+
+<Doc
+  title={title}
+  seoTitle={title}
+  description={description}
+  summary={`The open reference controls grouped into ${families.length} families by the outcome each secures, with the primary sources behind every family and the controls in it.`}
+  crumbs={crumbs}
+  headings={headings}
+  sidebar={false}
+  siteVersion={false}
+  jsonLd={jsonLd}
+>
+  <div class="fam-head" data-pagefind-ignore>
+    <Byline date={updated} dateLabel="Updated" />
+  </div>
+
+  <Callout kind="note" title="Draft, open for technical review, not a claim of conformity">
+    <p>
+      The controls are draft control specifications, open for technical review: illustrative, not a
+      claim of conformity, not legal advice, not a standard and binding on no one. A family groups
+      controls by the outcome they secure; it is not a compliance category of any framework.
+    </p>
+  </Callout>
+
+  <p>
+    A <a href="/controls">control profile</a> says what kind of system a control is for. A family
+    says what outcome it secures, whatever the profile. Every control has one primary family and, where
+    two fit, up to two secondary ones; the more specific family is the primary. The counts below are
+    primary families, computed from the registry at build time. Each family rests on at least two
+    primary sources, linked with the date they were read.
+  </p>
+
+  {
+    rows.map(({ family, primary, secondary }) => (
+      <section class="fam" data-family={family.id}>
+        <h2 id={family.id}>{family.order}. {family.title}</h2>
+        <p>{family.definition}</p>
+        <p class="fam-meta">Not in this family: {family.excludes}</p>
+        <p class="fam-meta">Anchored in:</p>
+        <ul>
+          {family.anchors.map((a) => (
+            <li>
+              <a href={a.url} rel="noopener">{a.framework}</a>, {a.ref} (read {a.read})
+            </li>
+          ))}
+        </ul>
+        <p class="fam-count">
+          <strong>{plural(primary.length, 'control')}</strong>
+          {secondary > 0 && <> as primary family, and {plural(secondary, 'control')} as a secondary one</>}.
+          {primary.length + secondary === 0 && <> This family has no controls yet.</>}
+        </p>
+        {primary.length > 0 && (
+          <ul class="fam-controls">
+            {primary.map((c) => (
+              <li>
+                <a href={controlPath(c)}><code>{c.id}</code> {c.title}</a>
+                {' '}(<a href={profilePath(c.profile)}>{c.profile}</a>)
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    ))
+  }
+</Doc>
+
+<style>
+  .fam-head {
+    margin: 0 0 var(--s-5);
+  }
+
+  .fam-head :global(.byline) {
+    margin-top: 0;
+  }
+
+  .fam-meta {
+    margin-bottom: var(--s-2);
+    color: var(--ink-2);
+    font-size: var(--fs-label);
+  }
+</style>

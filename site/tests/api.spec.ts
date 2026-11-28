@@ -121,6 +121,25 @@ test.describe('open-data API', () => {
     }
   });
 
+  test('every control names a published family, in the dataset and in its own file, and the family counts add up', () => {
+    const doc = readJson(join(API_DIR, 'controls.json'));
+    const families = doc.families as { id: string; controlCount: number; secondaryControlCount: number }[];
+    const rows = doc.controls as Json[];
+    expect(families.length).toBeGreaterThan(0);
+    const ids = new Set(families.map((f) => f.id));
+    for (const row of rows) {
+      expect(ids.has(String(row.family)), String(row.id)).toBe(true);
+      for (const f of row.secondaryFamilies as string[]) expect(ids.has(f), `${row.id} ${f}`).toBe(true);
+      expect((row.appliesTo as string[]).length, String(row.id)).toBeGreaterThan(0);
+      const own = readJson(join(API_DIR, 'controls', `${String(row.id).toLowerCase()}.json`)).control as Json;
+      for (const key of ['family', 'secondaryFamilies', 'appliesTo', 'mappingsReviewed']) expect(own[key], `${row.id} ${key}`).toEqual(row[key]);
+    }
+    expect(families.reduce((n, f) => n + f.controlCount, 0)).toBe(rows.length);
+    expect(families.reduce((n, f) => n + f.secondaryControlCount, 0)).toBe(
+      rows.reduce((n, r) => n + (r.secondaryFamilies as string[]).length, 0),
+    );
+  });
+
   test('crosswalk references resolve to register ids', () => {
     const crosswalk = readJson(join(API_DIR, 'crosswalk.json'));
     const ids = new Set(obligations.map((o) => o.id));

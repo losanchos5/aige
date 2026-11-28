@@ -224,6 +224,11 @@ export const GET: APIRoute = async (context) => {
         'Open control profiles for AI governance: each control with its evidence, mapped to the five-layer stack and reviewed in the open. Versioned and CC BY 4.0.',
       ),
       described(CONTROLS_CROSSWALK_PATH, CROSSWALK_TITLE, CROSSWALK_DESCRIPTION),
+      described(
+        '/controls/families',
+        'AI governance control families',
+        'The families that group the open AI governance controls by the outcome they secure, with each definition, its primary-source anchors and its controls.',
+      ),
       ...controlProfiles.flatMap((profile) => {
         const meta = profilePageMeta(profile.slug);
         return [

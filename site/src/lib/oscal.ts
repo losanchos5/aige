@@ -27,6 +27,7 @@ import {
   profileBySlug,
   controlsUpdated,
   type Control,
+  type ClassifiedControl,
   type ControlProfile,
 } from '../data/controls';
 import { personById } from '../data/people';
@@ -168,7 +169,7 @@ function controlParts(c: Control): Json[] {
   return list.filter((p): p is Json => p !== null);
 }
 
-function oscalControl(c: Control): Json {
+function oscalControl(c: ClassifiedControl): Json {
   return drop({
     id: c.id,
     class: 'aige',
@@ -181,6 +182,9 @@ function oscalControl(c: Control): Json {
       prop('reviewer-status', c.reviewerStatus),
       prop('depth', c.depth),
       prop('version', c.version),
+      prop('family', c.family),
+      ...(c.secondaryFamilies ?? []).map((f) => prop('secondary-family', f)),
+      ...c.appliesTo.map((a) => prop('applies-to', a)),
     ),
     links: [
       { href: abs(controlPath(c)), rel: 'canonical' },

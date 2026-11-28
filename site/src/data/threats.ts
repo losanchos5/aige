@@ -321,22 +321,62 @@ export const taxonomies: readonly ThreatTaxonomy[] = [
 // ---------------------------------------------------------------------------
 // Lookup tables for the control-framework columns
 
-/** ISO/IEC 42001:2023 Annex A controls used below: id -> short title. */
+/**
+ * ISO/IEC 42001:2023 Annex A: all 38 controls, id -> short label in this site's own words.
+ *
+ * PROVENANCE. Annex A is paywalled (https://www.iso.org/standard/81230.html answers 403), so no
+ * row here was checked against the standard text and none carries a `verified` date. The labels
+ * are this site's wording, not the standard's control titles. The 14 ids first used by the
+ * threat tables keep their original labels; the other 24 ids and the area structure (A.2 to
+ * A.10, 3+2+5+4+9+5+4+3+3 = 38) come from two secondary lists read on 2026-11-28 that agree
+ * line by line (riskprofs.com/iso-42001-annex-a-controls-list,
+ * tcsa.in/frameworks/iso-42001/controls); each label was rephrased from them, none is verified
+ * against the paid text. Every row's source is ISO42001_SOURCE.
+ */
+export const ISO42001_SOURCE = 'https://www.iso.org/standard/81230.html';
+
+/** id -> YYYY-MM-DD the row was checked against the standard's text. Empty: none has been. */
+export const iso42001Verified: Readonly<Record<string, string>> = {};
+
 export const iso42001Controls: Readonly<Record<string, string>> = {
+  'A.2.2': "The organisation's AI policy",
+  'A.2.3': "Consistency with the organisation's other policies",
+  'A.2.4': 'Keeping the AI policy under review',
+  'A.3.2': 'Who holds which AI role and duty',
+  'A.3.3': 'Raising concerns about AI',
+  'A.4.2': 'Recording the resources a system needs',
+  'A.4.3': 'Data an AI system relies on',
+  'A.4.4': 'Tools an AI system relies on',
+  'A.4.5': 'Systems and computing capacity',
+  'A.4.6': 'People and skills',
   'A.5.2': 'AI system impact assessment process',
+  'A.5.3': 'Records of impact assessments',
+  'A.5.4': 'Looking at effects on people and groups',
+  'A.5.5': 'Looking at effects on society',
+  'A.6.1.2': 'Goals for responsible AI development',
+  'A.6.1.3': 'Process for designing and building responsibly',
   'A.6.2.2': 'AI system requirements and specification',
+  'A.6.2.3': 'Records of design and build decisions',
   'A.6.2.4': 'AI system verification and validation',
   'A.6.2.5': 'AI system deployment',
   'A.6.2.6': 'AI system operation and monitoring',
+  'A.6.2.7': 'Technical file for an AI system',
   'A.6.2.8': 'AI system recording of event logs',
   'A.7.2': 'Data for development and enhancement of AI system',
+  'A.7.3': 'How data is acquired',
   'A.7.4': 'Quality of data for AI systems',
   'A.7.5': 'Data provenance',
+  'A.7.6': 'Getting data ready for use',
   'A.8.2': 'System documentation and information for users',
+  'A.8.3': 'Reporting to outside parties',
   'A.8.4': 'Communication of incidents',
+  'A.8.5': 'Information for stakeholders',
   'A.9.2': 'Processes for responsible use of AI systems',
+  'A.9.3': 'Goals for responsible use of AI',
   'A.9.4': 'Intended use of the AI system',
+  'A.10.2': 'Sharing responsibilities along the supply chain',
   'A.10.3': 'Suppliers',
+  'A.10.4': 'Obligations toward customers',
 };
 
 /** CSA AICM v1.1 domains: id -> title. */

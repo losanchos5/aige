@@ -32,6 +32,7 @@ import {
   controlAnchor,
   controlApiPath,
   controlPagePath,
+  depthLabel,
   nistAiRmfSubcategories,
   verificationLabels,
   subjectKindLabels,
@@ -46,6 +47,7 @@ import { agentControls, agentAnchors, agentChapter, type AgentControl } from '..
 import { obligationPath } from '../data/frameworks';
 import { iso42001Controls, threatById, threatAnchor, obligationLabel } from '../data/threats';
 import { derivedSources } from '../lib/controls-md';
+import { familyById, familyPath } from '../data/controls/families';
 
 interface Props {
   control: Control;
@@ -75,12 +77,14 @@ const threatRow = (id: string) => {
 const m = c.mappings;
 const hasMappings =
   m.obligations.length + m.iso42001.length + m.nistAiRmf.length + m.owasp.length +
-    (m.atlas?.length ?? 0) + (m.aiuc1?.length ?? 0) + (m.csaAicm?.length ?? 0) + (m.other?.length ?? 0) >
+    (m.atlas?.length ?? 0) + (m.aiuc1?.length ?? 0) + (m.csaAicm?.length ?? 0) + (m.gpaiCode?.length ?? 0) + (m.other?.length ?? 0) >
   0;
 const stubNote =
   'Draft outline: objective, failure modes and open questions only; requires technical review before it can be verified.';
 // A derived control names the site material it restates (lib/controls-md.ts).
 const restates = c.depth === 'derived' ? derivedSources(c) : [];
+const primaryOnly = c.depth === 'derived' && depthLabel(c) === 'Derived from a primary source';
+const family = c.family ? familyById(c.family) : undefined;
 const pagePath = standalone ? null : controlPagePath(c);
 ---
 
@@ -90,7 +94,7 @@ const pagePath = standalone ? null : controlPagePath(c);
   {
     c.depth === 'derived' && (
       <p class="ctl-state">
-        Derived from{' '}
+        {primaryOnly ? 'Derived from a primary source:' : 'Derived from'}{' '}
         {restates.map((s, i) => (
           <>{i > 0 && (i === restates.length - 1 ? ' and ' : ', ')}<a href={s.href}>{s.label}</a></>
         ))}{' '}
@@ -104,6 +108,17 @@ const pagePath = standalone ? null : controlPagePath(c);
     <dd>
       <code>{c.id}</code> · v{c.version} · {statusLabels[c.status]} · {reviewerStatusLabels[c.reviewerStatus]}
     </dd>
+
+    {
+      family && (
+        <>
+          <dt>Family</dt>
+          <dd>
+            <a href={familyPath(family.id)}>{family.title}</a>
+          </dd>
+        </>
+      )
+    }
 
     <dt>Objective</dt>
     <dd>{c.objective}</dd>
@@ -273,6 +288,11 @@ const pagePath = standalone ? null : controlPagePath(c);
                   <span class="ctl-k">CSA AICM:</span> {(m.csaAicm ?? []).join(', ')}
                 </li>
               )}
+              {(m.gpaiCode ?? []).length > 0 && (
+                <li>
+                  <span class="ctl-k">GPAI Code of Practice:</span> {(m.gpaiCode ?? []).join(', ')}
+                </li>
+              )}
               {(m.other ?? []).map((o) => (
                 <li>
                   <span class="ctl-k">{o.framework}:</span> {o.ref}
@@ -280,6 +300,18 @@ const pagePath = standalone ? null : controlPagePath(c);
                 </li>
               ))}
             </ul>
+          </dd>
+        </>
+      )
+    }
+
+    {
+      c.mappingsReviewed && (
+        <>
+          <dt>Mappings reviewed</dt>
+          <dd>
+            <time datetime={c.mappingsReviewed}>{c.mappingsReviewed}</time>
+            {' '}(date the mappings above were last reviewed)
           </dd>
         </>
       )

@@ -36,6 +36,7 @@ import {
   type ControlRegistry,
 } from '../src/data/controls';
 import { agentRuntimeAnchorHeadings, KEPT_VERBATIM } from '../src/data/controls/agent-runtime';
+import { families, familyProblems, type ControlFamily } from '../src/data/controls/families';
 import { aiuc1Requirements, aiuc1ById } from '../src/data/aiuc1';
 import { nistAiRmfSubcategoryIndex } from '../src/data/nist-ai-rmf';
 import { site } from '../src/data/site';
@@ -245,6 +246,65 @@ test.describe('registry rules: negative cases', () => {
   test('a derived control needs a seed or a derivedFrom source', () => {
     expect(flags(patched(DERIVED, { seeds: [] }), 'derived control with no seed and no derivedFrom source')).toBe(true);
     expect(problems(patched(DERIVED, { seeds: [], derivedFrom: [{ kind: 'pattern', ref: 'eval-gate-in-ci' }] }))).toEqual([]);
+  });
+
+  test('the 18 families keep their ids and order, and a family needs two anchors with a url and a read date', () => {
+    expect(families.map((f) => f.id)).toEqual([
+      'governance', 'inventory', 'risk-and-impact', 'data-and-privacy', 'lifecycle-and-change', 'evaluation-and-testing',
+      'fairness', 'transparency', 'rights-and-redress', 'human-oversight', 'agent-controls', 'ai-security', 'third-party',
+      'monitoring-and-logging', 'incidents-and-shutdown', 'documentation-and-evidence', 'literacy-and-use-policy', 'gpai-and-frontier',
+    ]);
+    const first = families[0];
+    const withFirst = (patch: Partial<ControlFamily>): ControlFamily[] => [{ ...first, ...patch }, ...families.slice(1)];
+    const flagged = (rows: ControlFamily[], text: string) => familyProblems(rows).some((p) => p.includes(text));
+    expect(flagged([...families, families[1]], 'duplicate id')).toBe(true);
+    expect(flagged(withFirst({ anchors: first.anchors.slice(0, 1) }), 'at least two anchors')).toBe(true);
+    expect(flagged(withFirst({ anchors: [{ ...first.anchors[0], url: '' }, first.anchors[1]] }), 'no absolute url')).toBe(true);
+    expect(flagged(withFirst({ anchors: [{ ...first.anchors[0], read: '' }, first.anchors[1]] }), 'no read date')).toBe(true);
+  });
+
+  test('a control needs a known primary family, distinct secondaries, 1 to 3 actors and a mappings date', () => {
+    expect(flags(patched(SPEC, { family: 'no-such-family' }), 'unknown or missing family')).toBe(true);
+    expect(flags(patched(SPEC, { family: undefined }), 'unknown or missing family')).toBe(true);
+    expect(flags(patched(SPEC, { family: 'agent-controls', secondaryFamilies: ['agent-controls'] }), 'repeats the primary')).toBe(true);
+    expect(flags(patched(SPEC, { secondaryFamilies: ['fairness', 'fairness'] }), 'repeated secondary family')).toBe(true);
+    expect(flags(patched(SPEC, { secondaryFamilies: ['fairness', 'transparency', 'governance'] }), 'more than two secondary')).toBe(true);
+    expect(flags(patched(SPEC, { appliesTo: [] }), 'appliesTo needs 1 to 3 actors')).toBe(true);
+    expect(flags(patched(SPEC, { appliesTo: ['regulator' as 'provider'] }), 'unknown actor')).toBe(true);
+    expect(flags(patched(SPEC, { mappingsReviewed: '26-09-2026' }), 'mappingsReviewed must be YYYY-MM-DD')).toBe(true);
+    expect(flags(patched(SPEC, { mappingsReviewed: '2026-99-99' }), 'mappingsReviewed must be YYYY-MM-DD')).toBe(true);
+    expect(flags({ ...registry(), controls: controls.filter((c) => c.id !== SPEC) }, `classification row ${SPEC} matches no control`)).toBe(true);
+    expect(problems(patched(SPEC, { secondaryFamilies: ['fairness', 'transparency'], appliesTo: ['provider', 'deployer', 'gpai-provider'] }))).toEqual([]);
+  });
+
+  test('a "source" origin must be the url of a primary, fully dated reference of the same control', () => {
+    const c = controlById(DERIVED)!;
+    const url = 'https://example.org/primary';
+    const reference = { title: 'A primary text', publisher: 'Issuer', date: '2026-11-28', url, verified: 'primary' as const };
+    const ok = patched(DERIVED, { references: [...c.references, reference], derivedFrom: [{ kind: 'source', ref: url }] });
+    expect(problems(ok)).toEqual([]);
+    const missing = patched(DERIVED, { derivedFrom: [{ kind: 'source', ref: url }] });
+    expect(flags(missing, 'is not one of the control')).toBe(true);
+    const undated = patched(DERIVED, { references: [...c.references, { ...reference, date: ' ' }], derivedFrom: [{ kind: 'source', ref: url }] });
+    expect(flags(undated, 'needs a full YYYY-MM-DD date')).toBe(true);
+    const month = patched(DERIVED, { references: [...c.references, { ...reference, date: '2026-11' }], derivedFrom: [{ kind: 'source', ref: url }] });
+    expect(flags(month, 'needs a full YYYY-MM-DD date')).toBe(true);
+    const secondary = patched(DERIVED, { references: [...c.references, { ...reference, verified: 'secondary' as const }], derivedFrom: [{ kind: 'source', ref: url }] });
+    expect(flags(secondary, 'must be a primary source')).toBe(true);
+  });
+
+  test('a control that maps an AI Act Art. 53 or 55 or GPAI Code obligation must apply to GPAI model providers', () => {
+    const gpai = controls.find((c) => c.mappings.obligations.some((id) => /EUAIA-ART5[35]|GPAICOP/.test(id)));
+    expect(gpai).toBeDefined();
+    const appliesTo = gpai!.appliesTo.filter((a) => a !== 'gpai-provider');
+    expect(flags(patched(gpai!.id, { appliesTo: appliesTo.length ? appliesTo : ['provider'] }), 'appliesTo lacks gpai-provider')).toBe(true);
+  });
+
+  test('a CSA AICM or GPAI Code mapping must be an id of its reference table', () => {
+    const base = controlById(SPEC)!.mappings;
+    expect(flags(patched(SPEC, { mappings: { ...base, csaAicm: ['GRC-99'] } }), 'CSA AICM id GRC-99 is not in the v1.1 table')).toBe(true);
+    expect(flags(patched(SPEC, { mappings: { ...base, gpaiCode: ['S99.9'] } }), 'GPAI Code measure S99.9 is not in the table')).toBe(true);
+    expect(problems(patched(SPEC, { mappings: { ...base, csaAicm: ['GRC-01'], gpaiCode: ['S3.2'] } }))).toEqual([]);
   });
 
   test('an AIUC-1 id must be in the public index and not retired', () => {
